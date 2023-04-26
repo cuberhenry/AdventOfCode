@@ -94,7 +94,9 @@ public class Main {
             return;
         }
         // Take in the part and file name
-        PART = Integer.parseInt(args[0]);
+        try {
+            PART = Integer.parseInt(args[0]);
+        } catch (Exception e){}
         if (!(PART == 1 || PART == 2)){
             System.out.println("Part can only be 1 or 2");
             return;
@@ -115,12 +117,17 @@ public class Main {
         
         // Loop through all of the monkeys
         while (sc.hasNext()){
+            // Take in the next line
+            String line = sc.nextLine();
+            // Skip the space between monkeys
+            if (line.equals("")){
+                line = sc.nextLine();
+            }
+
             // List of current items, to be added later
             ArrayList<Long> list = new ArrayList<>();
-            // Skip monkey number line
-            sc.nextLine();
-            // Take in the list of items
-            String line = sc.nextLine();
+            // Skip monkey number line and take in the list of items
+            line = sc.nextLine();
             // Add the items to list
             for (int j=18; j<line.length(); j+=4){
                 list.add(Long.parseLong(line.substring(j,j+2)));
@@ -139,10 +146,6 @@ public class Main {
             // Give the monkey the items
             while (!list.isEmpty()){
                 monkeys.get(monkeys.size()-1).giveMonkey(list.remove(0));
-            }
-            // Skip the space between monkeys
-            if (sc.hasNext()){
-                sc.nextLine();
             }
         }
         

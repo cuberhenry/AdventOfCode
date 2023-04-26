@@ -20,7 +20,9 @@ public class Main {
             return;
         }
         // Take in the part and file name
-        PART = Integer.parseInt(args[0]);
+        try {
+            PART = Integer.parseInt(args[0]);
+        } catch (Exception e){}
         if (!(PART == 1 || PART == 2)){
             System.out.println("Part can only be 1 or 2");
             return;
