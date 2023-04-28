@@ -37,8 +37,8 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // 
-        ArrayList<String> sList = new ArrayList<>();
+        // The combinations of indeces, used to find a cycle
+        ArrayList<String> combos = new ArrayList<>();
         // The height of the tower
         long height = 0;
         // The input
@@ -113,7 +113,7 @@ public class Main {
             }
 
             // If this combination has been found before
-            if (sList.contains(gasIndex+" "+objIndex)){
+            if (combos.contains(gasIndex+" "+objIndex)){
                 // Save the index
                 cycleIndex = gasIndex;
                 // The height of the tower before the cycle
@@ -122,13 +122,13 @@ public class Main {
                 cycleStartBlocks = numBlocks;
 
                 // Make sure this doesn't get triggered again
-                sList.clear();
+                combos.clear();
             }
 
             // Until the cycle has been found
             if (cycleStartBlocks == 0){
                 // Save the gas and object index pair
-                sList.add(gasIndex+" "+objIndex);
+                combos.add(gasIndex+" "+objIndex);
             }
             
             // Increase the number of blocks falling
