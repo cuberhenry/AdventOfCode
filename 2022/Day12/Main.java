@@ -106,7 +106,7 @@ public class Main {
             int i = Integer.parseInt(pos[0]);
             int j = Integer.parseInt(pos[1]);
             
-            // Part 1 finds the distance from 'S' to 'F'
+            // Part 1 finds the distance from 'S' to 'E'
             if (PART == 1){
                 if (finX == j && finY == i){
                     System.out.println(dist.get(i)[j]);
@@ -114,7 +114,7 @@ public class Main {
                 }
             }
             
-            // Part 2 finds the distance from any 'a' to 'F'
+            // Part 2 finds the distance from any 'a' to 'E'
             if (PART == 2){
                 if (grid.get(i)[j] == 0){
                     System.out.println(dist.get(i)[j]);

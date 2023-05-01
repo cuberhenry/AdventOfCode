@@ -75,6 +75,7 @@ public class Main {
                 }
             }
 
+            // Add the change to the position
             if (num == 2){
                 pos += Integer.parseInt(line.substring(5));
             }

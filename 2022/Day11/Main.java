@@ -149,13 +149,15 @@ public class Main {
             }
         }
         
-        // The number of rounds for the two Parts are different
+        // The number of rounds
         int numRounds = 0;
         
+        // Part 1 performs 20 rounds
         if (PART == 1){
             numRounds = 20;
         }
         
+        // Part 2 performs 10,000 rounds
         if (PART == 2){
             numRounds = 10000;
         }
@@ -163,9 +165,9 @@ public class Main {
         // Loop through the number of rounds
         for (int i=0; i<numRounds; ++i){
             // Loop through each monkey
-            for (int j=0; j<monkeys.size(); ++j){
+            for (Monkey monkey : monkeys){
                 // Allow the monkey to inspect all of the items
-                monkeys.get(j).inspect(monkeys,modulo);
+                monkey.inspect(monkeys,modulo);
             }
         }
         
@@ -173,12 +175,12 @@ public class Main {
         long max = 0;
         long two = 0;
         // Find the two most active monkeys
-        for (int i=0; i<monkeys.size(); ++i){
-            if (monkeys.get(i).getInspected() > max){
+        for (Monkey monkey : monkeys){
+            if (monkey.getInspected() > max){
                 two = max;
-                max = monkeys.get(i).getInspected();
-            }else if (monkeys.get(i).getInspected() > two){
-                two = monkeys.get(i).getInspected();
+                max = monkey.getInspected();
+            }else if (monkey.getInspected() > two){
+                two = monkey.getInspected();
             }
         }
         System.out.println(max * two);

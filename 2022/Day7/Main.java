@@ -46,7 +46,7 @@ public class Main {
         ArrayList<Integer> array = new ArrayList<>();
 
         // Loop through all lines of input
-        for (int i=0; i<979; ++i){
+        while (sc.hasNext()){
             // Current command or display
             String line = sc.nextLine();
             
