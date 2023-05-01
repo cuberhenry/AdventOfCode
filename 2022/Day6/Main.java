@@ -38,29 +38,38 @@ public class Main {
         }
         // The input as a string
         String input = sc.next();
+        // The number of unique characters needed
+        int numChars = 0;
+        // The characters being compared
+        ArrayList<Character> chars = new ArrayList<>();
 
-        // Loop through every character in the input
-        for (int i=0; i<input.length(); ++i){
-            // Whether the loops should continue searching
-            boolean good = true;
-            // Part 1 requires 4 unique characters
-            // Part 2 requires 14 unique characters
-            // Loop through every one of the 4/14 characters
-            for (int j=0; j<PART * 10 - 7 && good; ++j){
-                for (int k=j+1; k<PART * 10 - 6 && good; ++k){
-                    // If it's a duplicate, the sequence has not been found
-                    if (input.charAt((j+i) % input.length())
-                        == input.charAt((k+i) % input.length())){
-                        good = false;
-                    }
-                }
-            }
-            
-            // If there's no duplicates, print how many characters were searched
-            if (good){
-                System.out.println(i + (PART * 10 - 6));
-                break;
-            }
+        // Part 1 requires 4 unique characters
+        if (PART == 1){
+            numChars = 4;
         }
+
+        // Part 2 requires 14 unique characters
+        if (PART == 2){
+            numChars = 14;
+        }
+
+        // The index of the current character
+        int i = 0;
+        // Until there are numChars unique characters
+        while (chars.size() < numChars){
+            // Save the index of the value
+            int copy = chars.indexOf(input.charAt(i));
+            // While there are characters before the duplicate
+            while (copy < chars.size() && copy >= 0){
+                // Remove them
+                chars.remove(copy);
+            }
+            // Add the character
+            chars.add(0,input.charAt(i));
+            // increase the index
+            ++i;
+        }
+        // Print out the number of chars read
+        System.out.println(i);
     }
 }
