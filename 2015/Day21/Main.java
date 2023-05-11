@@ -162,18 +162,24 @@ public class Main {
             // Get the variables
             int youHP = 100;
             int bossHP = hp;
-            int youDamage = stats.get(i)[1];
-            int youArmor = stats.get(i)[2];
+            int youDamage = stats.get(i)[1] - armor;
+            if (youDamage < 1){
+                youDamage = 1;
+            }
+            int bossDamage = damage - stats.get(i)[2];
+            if (bossDamage < 1){
+                bossDamage = 1;
+            }
             // While the battle isn't done
             while (youHP > 0){
                 // You attack
-                bossHP -= youDamage - armor;
+                bossHP -= youDamage;
                 // If the boss loses, break
                 if (bossHP <= 0){
                     break;
                 }
                 // The boss attacks
-                youHP -= damage - youArmor;
+                youHP -= bossDamage;
             }
 
             if (PART == 1){
