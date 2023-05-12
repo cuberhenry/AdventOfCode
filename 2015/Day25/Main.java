@@ -38,7 +38,7 @@ public class Main {
         }
         // Part 2 does not require any code to solve
         if (PART == 2){
-            System.out.println("Start the Machine");
+            System.out.println("Start the Weather Machine");
             return;
         }
 
