@@ -36,7 +36,6 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-
         // The answer to the problem
         long total = 0;
         // A map containing all known patterns
