@@ -58,8 +58,16 @@ public class Main {
 
         // Loop through every relevant elf
         for (int i=1; i<index; ++i){
+
             // Loop through every relevant house to be delivered to
             for (int j=i; j<index; j+=i){
+                // Deliver only to 50 houses
+                if (PART == 2){
+                    if ((j-i)/i == 50){
+                        break;
+                    }
+                }
+
                 // Deliver presents
                 presents[j] += i;
 
@@ -69,12 +77,7 @@ public class Main {
                     index = j;
                 }
 
-                // Deliver only to 50 houses
-                if (PART == 2){
-                    if ((j-i)/i == 50){
-                        break;
-                    }
-                }
+                
             }
         }
 
