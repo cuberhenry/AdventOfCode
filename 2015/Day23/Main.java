@@ -43,7 +43,7 @@ public class Main {
             instructions.add(sc.nextLine());
         }
         // The value of register a
-        int a = 0;
+        long a = 0;
 
         // Part 1 finds the value of register b after the program quits
         // Part 2 sets a to 1 first, then does the same
@@ -52,7 +52,7 @@ public class Main {
         }
 
         // The value of register b
-        int b = 0;
+        long b = 0;
         // Loop until an instruction that isn't specified is looked for
         for (int index = 0; index >= 0 && index < instructions.size(); ++index){
             // Grab the instruction
