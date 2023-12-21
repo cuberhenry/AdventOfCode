@@ -58,7 +58,6 @@ public class Main {
 
         // Loop through every relevant elf
         for (int i=1; i<index; ++i){
-
             // Loop through every relevant house to be delivered to
             for (int j=i; j<index; j+=i){
                 // Deliver only to 50 houses
@@ -76,8 +75,6 @@ public class Main {
                     // Save the index
                     index = j;
                 }
-
-                
             }
         }
 
