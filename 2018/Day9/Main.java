@@ -36,4 +36,51 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // Disse
+        // Dissect the input
+        String[] input = sc.nextLine().split(" ");
+        int players = Integer.parseInt(input[0]);
+        int marbles = Integer.parseInt(input[6]) + 1;
+
+        // Part 1 finds the winning elf's score
+        // Part 2 uses 100 times as many marbles
+        if (PART == 2){
+            marbles = (marbles-1) * 100 + 1;
+        }
+
+        // The placed marbles
+        LinkedList<Integer> circle = new LinkedList<>();
+        circle.add(0);
+        // The scores (ordering is irrelevant)
+        long[] scores = new long[players];
+
+        // Loop through every marble after the first
+        for (int i=1; i<marbles; ++i){
+            // Decide what to do
+            if (i % 23 == 0){
+                // Loop back 6 times
+                circle.addFirst(circle.removeLast());
+                circle.addFirst(circle.removeLast());
+                circle.addFirst(circle.removeLast());
+                circle.addFirst(circle.removeLast());
+                circle.addFirst(circle.removeLast());
+                circle.addFirst(circle.removeLast());
+                // Add the score to the current elf's score
+                scores[i%scores.length] += i + circle.removeLast();
+            }else{
+                // Loop forward twice
+                circle.addLast(circle.removeFirst());
+                circle.addLast(circle.removeFirst());
+                // Add the new marble
+                circle.addFirst(i);
+            }
+        }
+
+        // Find the max score
+        long max = 0;
+        for (int i=0; i<scores.length; ++i){
+            max = Math.max(scores[i],max);
+        }
+        // Print the answer
+        System.out.println(max);
+    }
+}
