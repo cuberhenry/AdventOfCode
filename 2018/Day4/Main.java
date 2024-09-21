@@ -1,7 +1,7 @@
 /*
 Henry Anderson
-Advent of Code 2018 Day 1 https://adventofcode.com/2018/day/1
-Input: https://adventofcode.com/2018/day/1/input
+Advent of Code 2018 Day 4 https://adventofcode.com/2018/day/4
+Input: https://adventofcode.com/2018/day/4/input
 1st command line argument is which part of the daily puzzle to solve
 2nd command line argument is the file name of the input, defaulted to
     "input.txt"
