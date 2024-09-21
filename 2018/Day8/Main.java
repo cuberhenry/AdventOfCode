@@ -37,4 +37,75 @@ public class Main {
             return;
         }
 
-        // Part
+        // Part 1 finds the sum of all metadata
+        if (PART == 1){
+            System.out.println(part1());
+        }
+
+        // Part 2 finds the value of the root node
+        if (PART == 2){
+            System.out.println(part2());
+        }
+    }
+
+    private static int part1(){
+        // The number of children
+        int children = sc.nextInt();
+        // The number of metadata entries
+        int metadata = sc.nextInt();
+        // The value of the node
+        int total = 0;
+
+        // Loop through every child
+        for (int i=0; i<children; ++i){
+            // Add the child's value
+            total += part1();
+        }
+
+        // Loop through every metadata item
+        for (int i=0; i<metadata; ++i){
+            // Add to the value
+            total += sc.nextInt();
+        }
+
+        // Return the answer
+        return total;
+    }
+
+    private static int part2(){
+        // The node's children
+        int[] children = new int[sc.nextInt()];
+        // The number of metadata entries
+        int metadata = sc.nextInt();
+        // The value of the node
+        int total = 0;
+
+        // Loop through every child
+        for (int i=0; i<children.length; ++i){
+            // Save the child's value
+            children[i] = part2();
+        }
+
+        if (children.length == 0){
+            // Nodes with no children returns the sum of its metadata
+            for (int i=0; i<metadata; ++i){
+                // Add to the value
+                total += sc.nextInt();
+            }
+        }else{
+            // Nodes with children returns the value of each indicated child
+            for (int i=0; i<metadata; ++i){
+                // Save the index
+                int index = sc.nextInt();
+                // If it's a valid child
+                if (index <= children.length){
+                    // Add to the value
+                    total += children[index-1];
+                }
+            }
+        }
+
+        // Return the answer
+        return total;
+    }
+}
