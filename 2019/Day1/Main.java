@@ -36,4 +36,28 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // The amount of required 
+        // The amount of required fuel
+        int answer = 0;
+        
+        // Take in every module
+        while (sc.hasNext()){
+            // Add its fuel requirement
+            int subAnswer = sc.nextInt()/3-2;
+            answer += subAnswer;
+
+            // Part 1 finds the fuel required for each module
+            // Part 2 finds the fuel required for each module and its fuel
+            if (PART == 2){
+                // Continue until a negative fuel would be added
+                while (subAnswer > 5){
+                    // Add the fuel's fuel requirement
+                    subAnswer = subAnswer/3-2;
+                    answer += subAnswer;
+                }
+            }
+        }
+
+        // Print the answer
+        System.out.println(answer);
+    }
+}
