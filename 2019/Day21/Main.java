@@ -1,7 +1,7 @@
 /*
 Henry Anderson
-Advent of Code 2019 Day 5 https://adventofcode.com/2019/day/5
-Input: https://adventofcode.com/2019/day/5/input
+Advent of Code 2019 Day 21 https://adventofcode.com/2019/day/21
+Input: https://adventofcode.com/2019/day/21/input
 1st command line argument is which part of the daily puzzle to solve
 2nd command line argument is the file name of the input, defaulted to
     "input.txt"
@@ -37,16 +37,34 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // Create the program
+        // Initialize the program
         IntCode program = new IntCode(sc.nextLine());
 
-        // Part 1 finds the last output with input 1
+        // Jump if the landing block is solid and there's a hole between
+        // (!C | !B | !A) & D
+        program.addInput("NOT C J");
+        program.addInput("NOT B T");
+        program.addInput("OR T J");
+        program.addInput("NOT A T");
+        program.addInput("OR T J");
+        program.addInput("AND D J");
+
+        // Part 1 uses the walk instruction, which can see 4 ahead
         if (PART == 1){
-            program.addInput(1);
+            // (!C | !B | !A) & D
+            program.addInput("WALK");
         }
-        // Part 2 finds the last output with input 5
+
+        // Part 2 uses the run instruction, which can see 9 ahead
         if (PART == 2){
-            program.addInput(5);
+            // Jump if the landing block is solid, there's a hole between,
+            // and there is a block accessible from the landing block
+            // (!C | !B | !A) & D & (E | H)
+            program.addInput("AND A T");
+            program.addInput("OR E T");
+            program.addInput("OR H T");
+            program.addInput("AND T J");
+            program.addInput("RUN");
         }
 
         // Print the answer

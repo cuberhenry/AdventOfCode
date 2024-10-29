@@ -8,6 +8,7 @@ Input: https://adventofcode.com/2019/day/11/input
 */
 import java.util.*;
 import java.io.*;
+import com.aoc.mylibrary.IntCode;
 public class Main {
     // The desired problem to solve
     static int PART;
@@ -36,21 +37,11 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // Take in the input
-        String[] split = sc.nextLine().split(",");
-        // The program
-        long[] program = new long[split.length];
-        for (int i=0; i<split.length; ++i){
-            program[i] = Long.parseLong(split[i]);
-        }
+        // Create the program
+        IntCode program = new IntCode(sc.nextLine());
 
-        // HashMap for registers beyond the program
-        HashMap<Long,Long> memory = new HashMap<>();
-
-        // Whether the next action should be paint or move
-        boolean move = false;
-        // HashMap for the painted squares
-        HashMap<String,Integer> painted = new HashMap<>();
+        // List of white squares
+        HashMap<String,Boolean> painted = new HashMap<>();
         // The coordinates of the robot
         int x = 0;
         int y = 0;
@@ -64,356 +55,31 @@ public class Main {
         // Part 1 finds the number of squares painted starting on black
         // Part 2 finds the message painted starting on white
         if (PART == 2){
-            painted.put("0 0",1);
+            painted.put("0 0",true);
         }
-
-        /*
-         * Parameter Modes:
-         * 
-         * 0: Position Mode, position
-         * 1: Immediate Mode, value
-         * 2: Relative Mode, relative position
-         */
-
-        // Run the program
-        int i = 0;
-        long relativeBase = 0;
-        // Halt (OP): OP == 99
-        while (program[i] != 99){
-            // Perform the operation
-            switch((int)(program[i]%100)){
-                // Add (BAOP A B C): OP == 01, C = A + B
-                case 1 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    long C = program[i+3];
-                    if (program[i] / 10000 % 10 == 2){
-                        C += relativeBase;
-                    }
-                    if (C < program.length){
-                        program[(int)C] = A + B;
-                    }else{
-                        memory.put(C,A+B);
-                    }
-                    i += 4;
-                }
-                // Multiply (BAOP A B C): OP == 02, C = A * B
-                case 2 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    long C = program[i+3];
-                    if (program[i] / 10000 % 10 == 2){
-                        C += relativeBase;
-                    }
-                    if (C < program.length){
-                        program[(int)C] = A * B;
-                    }else{
-                        memory.put(C,A*B);
-                    }
-                    i += 4;
-                }
-                // Load (OP A): OP == 03, A = input
-                case 3 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 == 2){
-                        A += relativeBase;
-                    }
-
-                    long input = 0;
-                    if (painted.containsKey(x + " " + y)){
-                        input = painted.get(x + " " + y);
-                    }
-
-                    if (A < program.length){
-                        program[(int)A] = input;
-                    }else{
-                        memory.put(A,input);
-                    }
-                    i += 2;
-                }
-                // Output (AOP A): OP == 04, output = A
-                case 4 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-
-                    if (move){
-                        dir = (int)(dir + 2 * A + 3) % 4;
-                        switch(dir){
-                            case 0 -> {++y;}
-                            case 1 -> {++x;}
-                            case 2 -> {--y;}
-                            case 3 -> {--x;}
-                        }
-                    }else{
-                        painted.put(x + " " + y,(int)A);
-                        if (A == 1){
-                            minX = Math.min(minX,x);
-                            minY = Math.min(minY,y);
-                            maxX = Math.max(maxX,x);
-                            maxY = Math.max(maxY,y);
-                        }
-                    }
-                    move = !move;
-
-                    i += 2;
-                }
-                // Jump If True (BAOP A B): OP == 05, if A != 0 jumpto B
-                case 5 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    if (A != 0){
-                        i = (int)B;
-                    }else{
-                        i += 3;
-                    }
-                }
-                // Jump If False (BAOP A B): OP == 06, if A == 0 jumpto B
-                case 6 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    if (A == 0){
-                        i = (int)B;
-                    }else{
-                        i += 3;
-                    }
-                }
-                // Less Than (BAOP A B C): OP == 07, C = A < B
-                case 7 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    long C = program[i+3];
-                    if (program[i] / 10000 % 10 == 2){
-                        C += relativeBase;
-                    }
-                    if (C < program.length){
-                        program[(int)C] = (A < B ? 1 : 0);
-                    }else{
-                        memory.put(C,(A < B ? 1L : 0));
-                    }
-                    i += 4;
-                }
-                // Equal To (BAOP A B C): OP == 08, C = A == B
-                case 8 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    long B = program[i+2];
-                    if (program[i] / 1000 % 10 != 1){
-                        if (program[i] / 1000 % 10 == 2){
-                            B += relativeBase;
-                        }
-                        if (B >= program.length){
-                            if (memory.containsKey(B)){
-                                B = memory.get(B);
-                            }else{
-                                B = 0;
-                            }
-                        }else{
-                            B = program[(int)B];
-                        }
-                    }
-                    long C = program[i+3];
-                    if (program[i] / 10000 % 10 == 2){
-                        C += relativeBase;
-                    }
-                    if (C < program.length){
-                        program[(int)C] = (A == B ? 1 : 0);
-                    }else{
-                        memory.put(C,(A == B ? 1L : 0));
-                    }
-                    i += 4;
-                }
-                // Adjust Rel Base (AOP A): OP == 09, relativeBase += A
-                case 9 -> {
-                    long A = program[i+1];
-                    if (program[i] / 100 % 10 != 1){
-                        if (program[i] / 100 % 10 == 2){
-                            A += relativeBase;
-                        }
-                        if (A >= program.length){
-                            if (memory.containsKey(A)){
-                                A = memory.get(A);
-                            }else{
-                                A = 0;
-                            }
-                        }else{
-                            A = program[(int)A];
-                        }
-                    }
-                    relativeBase += A;
-                    i += 2;
-                }
-                // Error: no opcode found
-                default -> {
-                    System.out.println("Error, no opcode found");
-                    break;
-                }
+        
+        // Continue until the program finishes
+        while (!program.isFinished()){
+            // Give the robot whether it's on white or black
+            program.addInput(painted.containsKey(x + " " + y) && painted.get(x + " " + y) ? 1 : 0);
+            // Get the output
+            ArrayList<Long> output = program.run();
+            // Add whether the spot is painted white or black
+            painted.put(x + " " + y,output.getFirst() == 1);
+            // Move the droid in the given direction
+            dir = (int)(dir + 2 * output.getLast() + 3) % 4;
+            switch(dir){
+                case 0 -> {++y;}
+                case 1 -> {++x;}
+                case 2 -> {--y;}
+                case 3 -> {--x;}
             }
+
+            // Save the new boundaries
+            minX = Math.min(minX,x);
+            maxX = Math.max(maxX,x);
+            minY = Math.min(minY,y);
+            maxY = Math.max(maxY,y);
         }
 
         if (PART == 1){
@@ -422,23 +88,10 @@ public class Main {
         }
 
         if (PART == 2){
-            // Find the message
-            boolean[][] grid = new boolean[maxY-minY+1][maxX-minX+1];
-            for (String key : painted.keySet()){
-                if (painted.get(key) == 1){
-                    String[] coords = key.split(" ");
-                    grid[Integer.parseInt(coords[1])-minY][Integer.parseInt(coords[0])-minX] = true;
-                }
-            }
-
             // Print the message
-            for (boolean[] line : grid){
-                for (boolean bool : line){
-                    if (bool){
-                        System.out.print("#");
-                    }else{
-                        System.out.print(" ");
-                    }
+            for (int i=maxY; i>=minY; --i){
+                for (int j=minX; j<=maxX; ++j){
+                    System.out.print(painted.containsKey(j + " " + i) && painted.get(j + " " + i) ? '#' : ' ');
                 }
                 System.out.println();
             }

@@ -36,7 +36,85 @@ public class Main {
             System.out.println("File not found");
             return;
         }
+        // Take in the directions for the first wire
+        String[] wire = sc.nextLine().split(",");
+        // The path the first wire takes
+        HashMap<String,Integer> wirePath1 = new HashMap<>();
+        // The current values for the first wire
+        int x = 0;
+        int y = 0;
+        int dist = 0;
 
-        
+        // Loop through each input instruction
+        for (int i=0; i<wire.length; ++i){
+            // Take in the number of steps to take in the given direction
+            int steps = Integer.parseInt(wire[i].substring(1));
+            // Loop through each step
+            for (int j=0; j<steps; ++j){
+                // Increase distance
+                ++dist;
+                // Take a step
+                switch(wire[i].charAt(0)){
+                    case 'U' -> ++y;
+                    case 'R' -> ++x;
+                    case 'D' -> --y;
+                    case 'L' -> --x;
+                }
+                // If unvisited, add the current distance
+                if (!wirePath1.containsKey(x + " " + y)){
+                    wirePath1.put(x + " " + y,dist);
+                }
+            }
+        }
+
+        // Take in the directions for the next wire
+        wire = sc.nextLine().split(",");
+        // The path the second wire takes
+        HashMap<String,Integer> wirePath2 = new HashMap<>();
+        // The current values for the first wire
+        x = 0;
+        y = 0;
+        dist = 0;
+
+        // The minimum distance to the interesection
+        int minDist = Integer.MAX_VALUE;
+
+        // Loop through each input instruction
+        for (int i=0; i<wire.length; ++i){
+            // Take in the number of steps to move in the given direction
+            int steps = Integer.parseInt(wire[i].substring(1));
+            // Loop through each step
+            for (int j=0; j<steps; ++j){
+                // Increase distance
+                ++dist;
+                // Take a step
+                switch(wire[i].charAt(0)){
+                    case 'U' -> ++y;
+                    case 'R' -> ++x;
+                    case 'D' -> --y;
+                    case 'L' -> --x;
+                }
+                // If unvisited, add the current distance
+                if (!wirePath2.containsKey(x + " " + y)){
+                    wirePath2.put(x + " " + y,dist);
+                }
+
+                // If this is a crossing between the wires
+                if (wirePath1.containsKey(x + " " + y)){
+                    // Part 1 finds the minimum Manhattan distance to the intersection
+                    if (PART == 1){
+                        minDist = Math.min(minDist,Math.abs(x) + Math.abs(y));
+                    }
+
+                    // Part 2 finds the minimum wire distance to the intersection
+                    if (PART == 2){
+                        minDist = Math.min(minDist,wirePath1.get(x + " " + y) + wirePath2.get(x + " " + y));
+                    }
+                }
+            }
+        }
+
+        // Print the answer
+        System.out.println(minDist);
     }
 }
