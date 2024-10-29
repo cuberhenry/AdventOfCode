@@ -47,9 +47,13 @@ public class Main {
 
         // The registers during the program
         int[] regs = new int[6];
+        // The reg from which to find the answer
+        int reg = Integer.parseInt(program.get(28)[1]);
 
         // History for finding repeats
-        ArrayList<Integer> history = new ArrayList<>();
+        HashSet<Integer> history = new HashSet<>();
+        // The last number to be put into history
+        int last = 0;
 
         // Take in every line of the program
         while (regs[ip] < program.size()){
@@ -64,18 +68,19 @@ public class Main {
             if (regs[ip] == 28){
                 // Part 1 finds the input that breaks the earliest
                 if (PART == 1){
-                    System.out.println(regs[3]);
+                    System.out.println(regs[reg]);
                     return;
                 }
 
                 // Part 2 finds the input that breaks the latest
                 // Check for a repeat
-                if (history.contains(regs[3])){
+                if (history.contains(regs[reg])){
                     // If there's a repeat, print the previous input
-                    System.out.println(history.getLast());
+                    System.out.println(last);
                     return;
                 }
-                history.add(regs[3]);
+                history.add(regs[reg]);
+                last = regs[reg];
             }
 
             // Perform the given operation

@@ -66,11 +66,13 @@ public class Main {
             // Part 2 is very inefficient, but it finds the sum of
             // all factors of register 5
             if (PART == 2){
+                // The index of the register that bounds the search
+                int bound = Integer.parseInt(program.get(4)[2]);
                 // If the registers have been initialized
                 if (regs[ip] == 1){
-                    // Loop through every possible factor of register 5
-                    for (int i=1; i<= regs[5]; ++i){
-                        if (regs[5] % i == 0){
+                    // Loop through every possible factor of the bound register
+                    for (int i=1; i<= regs[bound]; ++i){
+                        if (regs[bound] % i == 0){
                             regs[0] += i;
                         }
                     }
