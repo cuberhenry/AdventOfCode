@@ -44,7 +44,7 @@ public class Main {
         // While there are replacements
         while (!line.equals("")){
             // Add the replacement
-            replacements.add(line.split(" "));
+            replacements.add(line.split(" => "));
             // Take in the next line
             line = sc.nextLine();
         }
@@ -55,7 +55,7 @@ public class Main {
         // Part 1 finds the number of molecules that can be made with one replacement
         if (PART == 1){
             // The list of all molecules
-            ArrayList<String> molecules = new ArrayList<>();
+            HashSet<String> molecules = new HashSet<>();
             // Loop through every character of the input
             for (int i=0; i<molecule.length(); ++i){
                 // Loop through every possible replacement
@@ -64,7 +64,7 @@ public class Main {
                     if (replace[0].length()+i <= molecule.length()
                         && replace[0].equals(molecule.substring(i,i+replace[0].length()))){
                         // Create the new molecule
-                        String newMol = molecule.substring(0,i) + replace[2] + molecule.substring(i+replace[0].length());
+                        String newMol = molecule.substring(0,i) + replace[1] + molecule.substring(i+replace[0].length());
                         // If it's a unique molecule, add it
                         if (!molecules.contains(newMol)){
                             molecules.add(newMol);

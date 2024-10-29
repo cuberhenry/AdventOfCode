@@ -8,7 +8,6 @@ Input: https://adventofcode.com/2015/day/14/input
 */
 import java.util.*;
 import java.io.*;
-import java.net.http.HttpResponse.ResponseInfo;
 public class Main {
     // The desired problem to solve
     static int PART;

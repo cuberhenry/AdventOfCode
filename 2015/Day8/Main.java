@@ -82,12 +82,6 @@ public class Main {
         }
 
         // Print the answer
-        if (PART == 1){
-            System.out.println(total - size);
-        }
-
-        if (PART == 2){
-            System.out.println(size - total);
-        }
+        System.out.println(Math.abs(total - size));
     }
 }

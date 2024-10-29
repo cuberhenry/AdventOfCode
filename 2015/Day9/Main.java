@@ -8,6 +8,7 @@ Input: https://adventofcode.com/2015/day/9/input
 */
 import java.util.*;
 import java.io.*;
+import com.aoc.mylibrary.Library;
 public class Main {
     // The desired problem to solve
     static int PART;
@@ -53,35 +54,23 @@ public class Main {
                 cities.add(line[2]);
             }
             // Add the line to the input
-            input.add(line);
+            input.add(new String[] {line[0],line[2],line[4]});
         }
 
         // The array of distances between cities
-        int[][] dist = new int[cities.size()][cities.size()];
+        int[][] dist = Library.distMap(cities,input,true);
         // The maximum distance
         int maxDist = 0;
-
-        // Loop through every line of input
-        for (String[] line : input){
-            // Grab the distance
-            int distance = Integer.parseInt(line[4]);
-            // Add the distance bidirectionally
-            dist[cities.indexOf(line[0])][cities.indexOf(line[2])] = distance;
-            dist[cities.indexOf(line[2])][cities.indexOf(line[0])] = distance;
-            // If this distance is better, save it
-            if (distance > maxDist){
-                maxDist = distance;
+        for (int[] distance : dist){
+            for (int d : distance){
+                maxDist = Math.max(d,maxDist);
             }
         }
 
         // The answer to the problem
-        int best = Integer.MIN_VALUE;
+        int best = Integer.MAX_VALUE;
 
         // Part 1 finds the shortest distance required to visit all cities
-        if (PART == 1){
-            best = Integer.MAX_VALUE;
-        }
-
         // Part 2 finds the longest distance to do the same
         if (PART == 2){
             best = 0;

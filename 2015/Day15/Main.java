@@ -42,14 +42,14 @@ public class Main {
         // Loop through all input
         while (sc.hasNext()){
             // Get and split the line
-            String[] line = sc.nextLine().split(" ");
+            String[] line = sc.nextLine().split(", | ");
             // Create a new ingredient
             int[] ingredient = new int[5];
             // Grab the ingredient's attributes
-            ingredient[0] = Integer.parseInt(line[2].substring(0,line[2].length()-1));
-            ingredient[1] = Integer.parseInt(line[4].substring(0,line[4].length()-1));
-            ingredient[2] = Integer.parseInt(line[6].substring(0,line[6].length()-1));
-            ingredient[3] = Integer.parseInt(line[8].substring(0,line[8].length()-1));
+            ingredient[0] = Integer.parseInt(line[2]);
+            ingredient[1] = Integer.parseInt(line[4]);
+            ingredient[2] = Integer.parseInt(line[6]);
+            ingredient[3] = Integer.parseInt(line[8]);
             ingredient[4] = Integer.parseInt(line[10]);
             // Add the ingredient to the list of ingredients
             ingredients.add(ingredient);

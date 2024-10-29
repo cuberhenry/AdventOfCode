@@ -59,8 +59,7 @@ public class Main {
                 // The bow
                 total += l*w*h;
                 // Add two times the sum of the smallest dimensions
-                total += 2 * (l+w+h);
-                total -= 2 * (Math.max(Math.max(l,w),h));
+                total += 2 * (l+w+h - Math.max(Math.max(l,w),h));
             }
         }
 

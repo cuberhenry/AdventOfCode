@@ -8,6 +8,7 @@ Input: https://adventofcode.com/2015/day/13/input
 */
 import java.util.*;
 import java.io.*;
+import com.aoc.mylibrary.Library;
 public class Main {
     // The desired problem to solve
     static int PART;
@@ -50,7 +51,9 @@ public class Main {
                 people.add(line[0]);
             }
             // Add the line to input
-            input.add(line);
+            input.add(new String[] {line[0],
+                                    line[10].substring(0,line[10].length()-1),
+                                    (line[2].equals("lose") ? "-" : "") + line[3]});
         }
         
         // Part 1 finds the change of happiness for the optimal seating arrangement
@@ -60,29 +63,13 @@ public class Main {
         }
 
         // Create the happiness matrix
-        int[][] happiness = new int[people.size()][people.size()];
-
-        // The maximum happiness value
+        int[][] happiness = Library.distMap(people,input,false);
+        // Find the maximum happiness value
         int max = 0;
-        // Loop through every line of input
-        for (String[] line : input){
-            // Get the happiness value
-            int happy = Integer.parseInt(line[3]);
-            // Adjust to negative if they lose happiness
-            if (line[2].equals("lose")){
-                happy *= -1;
+        for (int[] happy : happiness){
+            for (int h : happy){
+                max = Math.max(h,max);
             }
-            // If it's a new max, save it
-            if (happy > max){
-                max = happy;
-            }
-            // Get the index of the first person
-            int first = people.indexOf(line[0]);
-            // Get the index of the second person
-            String withPeriod = line[10].substring(0,line[10].length()-1);
-            int second = people.indexOf(withPeriod);
-            // Add the value to the matrix
-            happiness[first][second] = happy;
         }
 
         // The answer to the problem

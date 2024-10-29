@@ -37,51 +37,37 @@ public class Main {
             return;
         }
         // All of the instructions
-        ArrayList<String> instructions = new ArrayList<>();
+        ArrayList<String[]> instructions = new ArrayList<>();
         // Take in all of the instructions
         while (sc.hasNext()){
-            instructions.add(sc.nextLine());
+            instructions.add(sc.nextLine().split(", | "));
         }
         // The value of register a
-        long a = 0;
+        long[] registers = new long[2];
 
         // Part 1 finds the value of register b after the program quits
         // Part 2 sets a to 1 first, then does the same
         if (PART == 2){
-            a = 1;
+            registers[0] = 1;
         }
 
-        // The value of register b
-        long b = 0;
         // Loop until an instruction that isn't specified is looked for
         for (int index = 0; index >= 0 && index < instructions.size(); ++index){
             // Grab the instruction
-            String[] instruction = instructions.get(index).split(" ");
+            String[] instruction = instructions.get(index);
             // Switch based on the instruction
             switch (instruction[0]){
                 // Half the value of the specified register
                 case "hlf" -> {
-                    if (instruction[1].equals("a")){
-                        a /= 2;
-                    }else{
-                        b /= 2;
-                    }
+                    registers[instruction[1].charAt(0) - 'a'] /= 2;
                 }
                 // Triple the value of the specified register
                 case "tpl" -> {
-                    if (instruction[1].equals("a")){
-                        a *= 3;
-                    }else{
-                        b *= 3;
-                    }
+                    registers[instruction[1].charAt(0) - 'a'] *= 3;
                 }
                 // Increment the value of the specified register
                 case "inc" -> {
-                    if (instruction[1].equals("a")){
-                        ++a;
-                    }else{
-                        ++b;
-                    }
+                    ++registers[instruction[1].charAt(0) - 'a'];
                 }
                 // Jump to the specified offset
                 case "jmp" -> {
@@ -90,16 +76,14 @@ public class Main {
                 // Jump to the specified offset if the specified
                 // register's value is even
                 case "jie" -> {
-                    if ((instruction[1].equals("a,") && a % 2 == 0)
-                        || (instruction[1].equals("b,") && b % 2 == 0)){
+                    if (registers[instruction[1].charAt(0)-'a'] % 2 == 0){
                         index += Integer.parseInt(instruction[2])-1;
                     }
                 }
                 // Jump to the specified offset if the specified
                 // register's value is 1
                 case "jio" -> {
-                    if ((instruction[1].equals("a,") && a == 1)
-                        || (instruction[1].equals("b,") && b == 1)){
+                    if (registers[instruction[1].charAt(0)-'a'] == 1){
                         index += Integer.parseInt(instruction[2])-1;
                     }
                 }
@@ -107,6 +91,6 @@ public class Main {
         }
 
         // Print the value of register b
-        System.out.println(b);
+        System.out.println(registers[1]);
     }
 }

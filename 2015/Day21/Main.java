@@ -40,13 +40,13 @@ public class Main {
         sc.next();
         sc.next();
         // The boss' health points
-        int hp = sc.nextInt();
+        int inputHP = sc.nextInt();
         sc.next();
         // The boss' attack
-        int damage = sc.nextInt();
+        int inputDamage = sc.nextInt();
         sc.next();
         // The boss' armor
-        int armor = sc.nextInt();
+        int inputArmor = sc.nextInt();
 
         // The list of all weapon options
         ArrayList<int[]> weapons = new ArrayList<>();
@@ -66,6 +66,8 @@ public class Main {
         armors.add(new int[] {53,0,3});
         armors.add(new int[] {75,0,4});
         armors.add(new int[] {102,0,5});
+        // No armor is an option
+        armors.add(new int[] {0,0,0});
 
         // The list of all ring options
         ArrayList<int[]> rings = new ArrayList<>();
@@ -76,75 +78,25 @@ public class Main {
         rings.add(new int[] {20,0,1});
         rings.add(new int[] {40,0,2});
         rings.add(new int[] {80,0,3});
+        // Can choose 0 or 1 rings
+        rings.add(new int[] {0,0,0});
+        rings.add(new int[] {0,0,0});
 
         // The list of all combinations
         ArrayList<int[]> stats = new ArrayList<>();
 
         // Loop through ever weapon option
-        for (int i=0; i<weapons.size(); ++i){
-            // Retrieve the stats for the weapon
-            int[] weapon = Arrays.copyOf(weapons.get(i),3);
-            // Add the weapon by itself (no armor or rings)
-            stats.add(weapon);
+        for (int[] weapon : weapons){
             // Loop through every armor
-            for (int j=0; j<armors.size(); ++j){
-                // Add the armor to the weapon
-                int[] sum = Arrays.copyOf(armors.get(j),3);
-                for (int k=0; k<3; ++k){
-                    sum[k] += weapon[k];
-                }
-                // Add the weapon armor combo (no rings)
-                stats.add(sum);
-            }
-        }
-
-        // Loop through every ring
-        for (int i=0; i<rings.size(); ++i){
-            // Retrieve the stats for the ring
-            int[] ring = Arrays.copyOf(rings.get(i),3);
-            // Loop through every weapon armor combo
-            for (int j=0; j<weapons.size()*(armors.size()+1); ++j){
-                // Add the ring to the combo
-                int[] stat = Arrays.copyOf(ring,3);
-                for (int k=0; k<3; ++k){
-                    stat[k] += stats.get(j)[k];
-                }
-                // Add the combo (only one ring)
-                stats.add(stat);
-            }
-            // Loop through every other future ring
-            for (int j=i+1; j<rings.size(); ++j){
-                // Loop through every weapon armor combo
-                for (int k=0; k<weapons.size()*(armors.size()+1); ++k){
-                    // Add the ring to the combo
-                    int[] stat = Arrays.copyOf(ring,3);
-                    for (int l=0; l<3; ++l){
-                        stat[l] += stats.get(k)[l] + rings.get(j)[l];
-                    }
-                    // Add the combo (all pieces)
-                    stats.add(stat);
-                }
-            }
-        }
-
-        // Loop through every pair of stats bidirectionally
-        for (int i=0; i<stats.size(); ++i){
-            for (int j=0; j<stats.size(); ++j){
-                // While i is at least as good as j in everything
-                while (i != j && j < stats.size() && i < stats.size()
-                && stats.get(i)[1] >= stats.get(j)[1]
-                && stats.get(i)[2] >= stats.get(j)[2]
-                && stats.get(i)[0] <= stats.get(j)[0]){
-                    // Part 1 finds the cheapest win
-                    if (PART == 1){
-                        // Remove the worse one
-                        stats.remove(j);
-                    }
-
-                    // Part 2 finds the most expensive loss
-                    if (PART == 2){
-                        // Remove the better one
-                        stats.remove(i);
+            for (int[] armor : armors){
+                for (int i=0; i<rings.size(); ++i){
+                    int[] ring1 = rings.get(i);
+                    for (int j=i+1; j<rings.size(); ++j){
+                        int[] ring2 = rings.get(j);
+                        // Add the combo
+                        stats.add(new int[] {weapon[0]+armor[0]+ring1[0]+ring2[0],
+                                            weapon[1]+armor[1]+ring1[1]+ring2[1],
+                                            weapon[2]+armor[2]+ring1[2]+ring2[2]});
                     }
                 }
             }
@@ -161,12 +113,12 @@ public class Main {
         for (int i=0; i<stats.size(); ++i){
             // Get the variables
             int youHP = 100;
-            int bossHP = hp;
-            int youDamage = stats.get(i)[1] - armor;
+            int bossHP = inputHP;
+            int youDamage = stats.get(i)[1] - inputArmor;
             if (youDamage < 1){
                 youDamage = 1;
             }
-            int bossDamage = damage - stats.get(i)[2];
+            int bossDamage = inputDamage - stats.get(i)[2];
             if (bossDamage < 1){
                 bossDamage = 1;
             }

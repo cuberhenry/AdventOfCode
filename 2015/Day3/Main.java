@@ -37,7 +37,7 @@ public class Main {
             return;
         }
         // All of the houses that received at least one present
-        ArrayList<String> delivered = new ArrayList<>();
+        HashSet<String> delivered = new HashSet<>();
         // Santa's position
         int x = 0;
         int y = 0;
@@ -65,7 +65,7 @@ public class Main {
             }
 
             // Part 1 finds how many houses Santa delivers to
-            // part 2 adds a Robot Santa
+            // Part 2 adds a Robot Santa
             if (PART == 2){
                 // Increase the index
                 ++i;

@@ -50,97 +50,91 @@ public class Main {
             ++height;
         }
         // Create the grid
-        int[][] grid = new int[width][height];
+        boolean[][] grid = new boolean[height][width];
 
         // Fill the grid
         for (int i=0; i<input.length(); ++i){
-            grid[i/height][i%height] = (input.charAt(i) == '#' ? 1 : 0);
+            grid[i/height][i%height] = input.charAt(i) == '#';
         }
 
         // Part 1 finds the number of lights on at the end of 100 rounds
         // Part 2 finds the number of lights assuming the four corners always stay on
         if (PART == 2){
             // Turn on the four corners
-            grid[0][0] = 1;
-            grid[0][height-1] = 1;
-            grid[width-1][0] = 1;
-            grid[width-1][height-1] = 1;
+            grid[0][0] = true;
+            grid[0][height-1] = true;
+            grid[width-1][0] = true;
+            grid[width-1][height-1] = true;
         }
 
         // Loop through all 100 steps
         for (int i=0; i<100; ++i){
             // Create a new grid
-            int[][] newGrid = new int[width][height];
+            boolean[][] newGrid = new boolean[width][height];
             // Loop through every point in the grid
-            for (int j=0; j<width; ++j){
-                for (int k=0; k<height; ++k){
-                    // Don't change the corners
-                    if (PART == 2){
-                        if ((j == 0 || j == width-1) && (k == 0 || k == height-1)){
-                            newGrid[j][k] = 1;
-                            continue;
+            for (int j=0; j<height; ++j){
+                for (int k=0; k<width; ++k){
+                    // The number of on neighbors
+                    int neighbors = 0;
+                    // Check up
+                    if (j > 0){
+                        if (grid[j-1][k]){
+                            ++neighbors;
+                        }
+                        // Check up left
+                        if (k > 0 && grid[j-1][k-1]){
+                            ++neighbors;
+                        }
+                        // Check up right
+                        if (k < height-1 && grid[j-1][k+1]){
+                            ++neighbors;
+                        }
+                    }
+                    // Check down
+                    if (j < height-1){
+                        if (grid[j+1][k]){
+                            ++neighbors;
+                        }
+                        // Check down left
+                        if (k > 0 && grid[j+1][k-1]){
+                            ++neighbors;
+                        }
+                        // Check down right
+                        if (k < width-1 && grid[j+1][k+1]){
+                            ++neighbors;
                         }
                     }
                     // Check left
-                    if (j > 0 && grid[j-1][k] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check up
-                    if (k > 0 && grid[j][k-1] == 1){
-                        ++newGrid[j][k];
+                    if (k > 0 && grid[j][k-1]){
+                        ++neighbors;
                     }
                     // Check right
-                    if (k < height-1 && grid[j][k+1] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check down
-                    if (j < width-1 && grid[j+1][k] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check up left
-                    if (j > 0 && k > 0 && grid[j-1][k-1] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check up right
-                    if (j < width-1 && k > 0 && grid[j+1][k-1] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check down left
-                    if (j > 0 && k < height-1 && grid[j-1][k+1] == 1){
-                        ++newGrid[j][k];
-                    }
-                    // Check down right
-                    if (j < width-1 && k < height-1 && grid[j+1][k+1] == 1){
-                        ++newGrid[j][k];
+                    if (k < height-1 && grid[j][k+1]){
+                        ++neighbors;
                     }
 
                     // Find new value
-                    if (grid[j][k] == 1){
-                        // Check for turning off
-                        if (newGrid[j][k] != 2 && newGrid[j][k] != 3){
-                            newGrid[j][k] = 0;
-                        }else{
-                            newGrid[j][k] = 1;
-                        }
-                    }else{
-                        // Check for turning on
-                        if (newGrid[j][k] == 3){
-                            newGrid[j][k] = 1;
-                        }else{
-                            newGrid[j][k] = 0;
-                        }
-                    }
+                    newGrid[j][k] = neighbors == 3 || grid[j][k] && neighbors == 2;
                 }
             }
+
+            // Don't change the corners
+            if (PART == 2){
+                newGrid[0][0] = true;
+                newGrid[height-1][0] = true;
+                newGrid[0][width-1] = true;
+                newGrid[height-1][width-1] = true;
+            }
+
             // Save the new grid
             grid = newGrid;
         }
 
         // Count the number of lights on at the end
         int total = 0;
-        for (int i=0; i<width; ++i){
-            for (int j=0; j<height; ++j){
-                if (grid[i][j] == 1){
+        for (boolean[] row : grid){
+            for (boolean light : row){
+                if (light){
                     ++total;
                 }
             }

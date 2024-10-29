@@ -45,7 +45,7 @@ public class Main {
             String line = sc.nextLine();
 
             // Part 1 finds the sum of all numbers in the input
-            // Part 2 ignores all numbers within an object that the attribute red
+            // Part 2 ignores all numbers within an object that has the attribute red
             if (PART == 2){
                 // Take in the index of the first instance of the attribute red
                 int index = line.indexOf(":\"red\"");

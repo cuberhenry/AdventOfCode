@@ -43,11 +43,11 @@ public class Main {
         }
 
         // Get the input
-        String[] line = sc.nextLine().split(" ");
+        String[] line = sc.nextLine().split("[.]  |[.]|, | ");
         // Grab the row
-        int row = Integer.parseInt(line[16].substring(0,line[16].length()-1));
+        int row = Integer.parseInt(line[15]);
         // Grab the column
-        int column = Integer.parseInt(line[18].substring(0,line[18].length()-1));
+        int column = Integer.parseInt(line[17]);
         // Change it so each row has row number of values
         row += column - 1;
 

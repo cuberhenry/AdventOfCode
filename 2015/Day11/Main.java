@@ -40,7 +40,13 @@ public class Main {
         char[] password = sc.next().toCharArray();
 
         // The number of times to find a new password
-        int numTimes = 0;
+        int numTimes = 1;
+
+        // Part 2 finds the second password
+        if (PART == 2){
+            numTimes = 2;
+        }
+
         // Continue until a break has been found
         while (true){
             // Whether there's a straight
@@ -86,19 +92,8 @@ public class Main {
 
             // If all conditions are met, password found
             if (straight && !forbidden && pairs >= 2){
-                ++numTimes;
-            }
-
-            // Part 1 finds the next available password
-            if (PART == 1){
-                if (numTimes == 1){
-                    break;
-                }
-            }
-
-            // Part 2 finds another password after that
-            if (PART == 2){
-                if (numTimes == 2){
+                --numTimes;
+                if (numTimes == 0){
                     break;
                 }
             }

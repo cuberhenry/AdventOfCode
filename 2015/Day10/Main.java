@@ -262,19 +262,15 @@ public class Main {
         }
 
         // The number of steps to perform
-        int numLoops = 0;
+        int numLoops = 40;
         
         // Part 1 finds the size of the result after 40 rounds
-        if (PART == 1){
-            numLoops = 40;
-        }
-
         // Part 2 finds the size of the result after 50 rounds
         if (PART == 2){
             numLoops = 50;
         }
 
-        // Perform numSteps times
+        // Perform numLoops times
         for (int i=0; i<numLoops; ++i){
             // The amount of each element in the next step
             int[] newElements = new int[numElements.length];

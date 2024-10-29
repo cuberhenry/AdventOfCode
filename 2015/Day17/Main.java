@@ -64,6 +64,7 @@ public class Main {
                     ++numContainers;
                 }
             }
+            
             // If this combination perfectly contains 150 liters
             if (liters == 150){
                 // Part 1 finds the number of combinations that hold exactly 150 liters
