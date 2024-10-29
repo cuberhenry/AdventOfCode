@@ -36,6 +36,45 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        
+        // The sliding window of depth
+        int[] window = new int[1];
+
+        // Part 1 finds the number of increasing depths
+        // Part 2 finds the same with an average of three
+        if (PART == 2){
+            window = new int[3];
+        }
+
+        // The total depth of the window
+        int depth = 0;
+        // Fill the window
+        for (int i=0; i<window.length; ++i){
+            window[i] = sc.nextInt();
+            depth += window[i];
+        }
+
+        // The number of increasing depths
+        int answer = 0;
+        while (sc.hasNext()){
+            // Save the old depth
+            int oldDepth = depth;
+            // Drop one off the window
+            depth -= window[0];
+            // Move them all over
+            for (int i=0; i<window.length-1; ++i){
+                window[i] = window[i+1];
+            }
+            // Take on the new value
+            window[window.length-1] = sc.nextInt();
+            depth += window[window.length-1];
+            
+            // If increasing, add
+            if (depth > oldDepth){
+                ++answer;
+            }
+        }
+
+        // Print the answer
+        System.out.println(answer);
     }
 }
