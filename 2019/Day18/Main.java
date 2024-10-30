@@ -42,7 +42,7 @@ public class Main {
         PriorityQueue<String> bfs = new PriorityQueue<>((a,b) -> {
             return Integer.compare(Integer.parseInt(a.split(" ")[0]),Integer.parseInt(b.split(" ")[0]));
         });
-        // The list of keys to collect
+        // The value when all keys have been collected
         int numKeys = 0;
 
         // Take in every line
@@ -51,10 +51,10 @@ public class Main {
             for (int i=0; i<line.length(); ++i){
                 // Save initial position
                 if (line.charAt(i) == '@'){
-                    bfs.add("0 " + i + " " + map.size());
+                    bfs.add("0 " + i + " " + map.size() + " 0");
                 }else if (Character.isLowerCase(line.charAt(i))){
                     // Add the key
-                    ++numKeys;
+                    numKeys = (numKeys << 1) + 1;
                 }
             }
             map.add(line);
@@ -112,13 +112,13 @@ public class Main {
             bfs.add("0 " + (x-1) + " " + (y-1)
                     + " " + (x+1) + " " + (y-1)
                     + " " + (x-1) + " " + (y+1)
-                    + " " + (x+1) + " " + (y+1));
+                    + " " + (x+1) + " " + (y+1) + " 0");
         }
 
         // History as to not repeat
-        HashSet<String> history = new HashSet<>();
+        HashMap<String,Integer> history = new HashMap<>();
         // Add the initial state into history
-        history.add(bfs.peek());
+        history.put(bfs.peek().substring(bfs.peek().indexOf(" ")+1),0);
 
         // Continue until all possibilities have been searched
         while (!bfs.isEmpty()){
@@ -133,10 +133,10 @@ public class Main {
                 coordinates[i][1] = Integer.parseInt(split[i*2+2]);
             }
             // The keys found so far in this state
-            String stateKeys = split.length % 2 == 1 ? "" : split[split.length-1];
+            int stateKeys = Integer.parseInt(split[split.length-1]);
 
             // If all keys have been found, this is the best state
-            if (stateKeys.length() == numKeys){
+            if (stateKeys == numKeys){
                 // Print the answer
                 System.out.println(steps);
                 return;
@@ -163,13 +163,13 @@ public class Main {
                         String[] innerSplit = innerBFS.remove().split(" ");
                         int x = Integer.parseInt(innerSplit[0]);
                         int y = Integer.parseInt(innerSplit[1]);
-                        String keysFound = innerSplit.length == 2 ? "" : innerSplit[2];
+                        int keysFound = Integer.parseInt(innerSplit[2]);
 
                         // Look in each direction
                         for (int i=0; i<4; ++i){
                             int newX = x;
                             int newY = y;
-                            String newKeys = keysFound;
+                            int newKeys = keysFound;
                             switch(i){
                                 case 0 -> {++newX;}
                                 case 1 -> {--newX;}
@@ -180,30 +180,43 @@ public class Main {
                             // Get the new character
                             char c = map.get(newY).charAt(newX);
                             // Wall or closed door, skip
-                            if (c == '#' || Character.isUpperCase(c) && !newKeys.contains(""+(char)(c+32))){
+                            if (c == '#' || Character.isUpperCase(c) && newKeys / (int)Math.pow(2,c-'A') % 2 == 0){
                                 continue;
                             }
 
                             // Whether a new key was found this step
                             boolean newKey = false;
                             // If it's an unfound key
-                            if (Character.isLowerCase(c) && !newKeys.contains(""+c)){
+                            if (Character.isLowerCase(c) && newKeys / (int)Math.pow(2,c-'a') % 2 == 0){
                                 newKey = true;
-                                newKeys += c;
-                                // Sort for state matching
-                                char[] array = newKeys.toCharArray();
-                                Arrays.sort(array);
-                                newKeys = new String(array);
+                                newKeys |= (int)Math.pow(2,c-'a');
                             }
-                            // Create the new outer state
-                            String newState = steps + innerSteps + " ";
+
+                            // Copy coordinates to a new one to sort by coordinates
+                            int[][] newCoordinates = new int[coordinates.length][2];
                             for (int k=0; k<coordinates.length; ++k){
-                                // Save the new coordinates for the current being, old for others
                                 if (k == j){
-                                    newState += newX + " " + newY + " ";
+                                    newCoordinates[k][0] = newX;
+                                    newCoordinates[k][1] = newY;
                                 }else{
-                                    newState += coordinates[k][0] + " " + coordinates[k][1] + " ";
+                                    newCoordinates[k][0] = coordinates[k][0];
+                                    newCoordinates[k][1] = coordinates[k][1];
                                 }
+                            }
+                            // Sort the array
+                            Arrays.sort(newCoordinates,(a,b) -> {
+                                int answer = Integer.compare(a[0],b[0]);
+                                if (answer == 0){
+                                    return Integer.compare(a[1],b[1]);
+                                }
+                                return answer;
+                            });
+
+                            // Create the new outer state
+                            String newState = "";
+                            for (int k=0; k<newCoordinates.length; ++k){
+                                // Save the new coordinates
+                                newState += newCoordinates[k][0] + " " + newCoordinates[k][1] + " ";
                             }
                             newState += newKeys;
 
@@ -211,16 +224,16 @@ public class Main {
                             String innerState = newX + " " + newY + " " + newKeys;
 
                             // If it's a completely new state
-                            if (!history.contains(newState) && !innerHistory.contains(innerState)){
+                            if ((!history.containsKey(newState) || history.get(newState) > steps + innerSteps) && !innerHistory.contains(innerState)){
                                 // Add it
-                                history.add(newState);
+                                history.put(newState,steps + innerSteps);
                                 innerHistory.add(innerState);
                                 if (newKey){
-                                    bfs.add(newState);
+                                    bfs.add(steps + innerSteps + " " + newState);
                                 }
                                 newInnerBFS.add(innerState);
                                 // If all keys are found, there's nothing else to do here
-                                if (newKeys.length() == numKeys){
+                                if (newKeys == numKeys){
                                     newInnerBFS.clear();
                                     innerBFS.clear();
                                     break;

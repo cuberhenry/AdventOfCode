@@ -182,7 +182,7 @@ public class Main {
         for (int i=0; i<Math.pow(2,heldItems.size()); ++i){
             // Drop all items that aren't in this combination
             for (int j=0; j<heldItems.size(); ++j){
-                if (i / (j+1) % 2 == 1){
+                if (i / (int)Math.pow(2,j) % 2 == 1){
                     program.addInput("drop " + heldItems.get(j));
                 }
             }
@@ -213,7 +213,7 @@ public class Main {
 
             // Pick up all dropped items
             for (int j=0; j<heldItems.size(); ++j){
-                if (i / (j+1) % 2 == 1){
+                if (i / (int)Math.pow(2,j) % 2 == 1){
                     program.addInput("take " + heldItems.get(j));
                 }
             }
