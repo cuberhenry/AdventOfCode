@@ -64,6 +64,13 @@ public class Main {
         int round;
         // Loop until no elves move
         for (round = 0; moved; ++round){
+            // Part 1 only performs 10 rounds
+            if (PART == 1){
+                if (round == 10){
+                    break;
+                }
+            }
+
             // No elves have moved this round
             moved = false;
 
@@ -171,13 +178,6 @@ public class Main {
             directions[1] = directions[2];
             directions[2] = directions[3];
             directions[3] = help;
-
-            // Part 1 only performs 10 rounds
-            if (PART == 1){
-                if (round == 10){
-                    break;
-                }
-            }
         }
 
         // Part 1 finds the number of empty squares between elves

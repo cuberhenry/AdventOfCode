@@ -36,7 +36,7 @@ public class Main {
             System.out.println("File not found");
             return;
         }
-        // The area in which the 
+        // The area in which the sand falls
         boolean[][] grid = new boolean[1000][1000];
         // The number of fallen sand pieces
         int total = 0;
