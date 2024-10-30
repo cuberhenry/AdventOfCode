@@ -273,7 +273,7 @@ public class Main {
         }
         // The list of all unplaced tiles
         ArrayList<Tile> tiles = new ArrayList<>();
-        while (sc.hasNextLine()){
+        while (sc.hasNext()){
             // Take in all new tiles
             tiles.add(new Tile(sc));
         }
