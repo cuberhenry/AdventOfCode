@@ -43,13 +43,15 @@ public class Main {
         }
         int size = scan.size();
 
-        // Create a grid representing the smallest risk
-        int[][] risk = new int[size][size];
+        int realSize = size;
 
         // Part 2 multiplies the square size by 25
         if (PART == 2){
-            risk = new int[size*5][size*5];
+            realSize *= 5;
         }
+
+        // Create a grid representing the smallest risk
+        final int[][] risk = new int[realSize][realSize];
 
         // Initialize all to infinity
         for (int i=0; i<risk.length; ++i){
@@ -60,15 +62,17 @@ public class Main {
 
         // Start at 0
         risk[0][0] = 0;
-        ArrayList<String> queue = new ArrayList<>();
-        queue.add("0 0");
+        PriorityQueue<int[]> queue = new PriorityQueue<>((a,b) -> {
+            return Integer.compare(risk[a[0]][a[1]],risk[b[0]][b[1]]);
+        });
+        queue.add(new int[] {0,0});
 
         // Continue until all shortest paths have been found
         while (!queue.isEmpty()){
             // Get the coordinates
-            String[] split = queue.removeFirst().split(" ");
-            int x = Integer.parseInt(split[0]);
-            int y = Integer.parseInt(split[1]);
+            int[] state = queue.remove();
+            int x = state[0];
+            int y = state[1];
 
             // Trim branches that can't possibly improve the final answer
             if (risk[y][x] + risk.length-x + risk.length-y >= risk[risk.length-1][risk.length-1]){
@@ -101,8 +105,8 @@ public class Main {
                         // Set it
                         risk[newY][newX] = newRisk;
                         // Add this new spot if it can improve the final answer
-                        if (!queue.contains(newX + " " + newY) && newRisk + risk.length-newX + risk.length-newY < risk[risk.length-1][risk.length-1]){
-                            queue.add(newX + " " + newY);
+                        if (newRisk + risk.length-newX + risk.length-newY < risk[risk.length-1][risk.length-1]){
+                            queue.add(new int[] {newX,newY});
                         }
                     }
                 }

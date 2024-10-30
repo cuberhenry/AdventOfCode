@@ -39,6 +39,7 @@ public class Main {
         // Part 2 doesn't require code
         if (PART == 2){
             System.out.println("Remotely Start The Sleigh");
+            return;
         }
 
         // The map of sea cucumbers
