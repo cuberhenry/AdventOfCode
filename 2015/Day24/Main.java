@@ -1,44 +1,16 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 24 https://adventofcode.com/2015/day/24
-Input: https://adventofcode.com/2015/day/24/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 24: It Hangs in the Balance";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // The list of all packages
         ArrayList<Integer> packages = new ArrayList<>();
-        // The desired weight for the passenger seat
+        // The total weight of the packages
         int weight = 0;
         // Loop through every package in the input
         while (sc.hasNext()){
@@ -48,23 +20,20 @@ public class Main {
             weight += w;
         }
 
-        // Part 1 splits the packages into 3 groups
-        if (PART == 1){
-            weight /= 3;
-        }
-
-        // Part 2 splits the packages into 4 groups
-        if (PART == 2){
-            weight /= 4;
-        }
-
         // The minimum quantum entanglement
-        long QE = Long.MAX_VALUE;
+        long part1 = Long.MAX_VALUE;
+        long part2 = part1;
 
         // Loop until a valid combination is found
-        for (int i=1; QE == Long.MAX_VALUE; ++i){
+        for (int i=1; part1 == Long.MAX_VALUE || part2 == Long.MAX_VALUE; ++i){
             // The indices of the packages being looked at
             int[] indices = new int[i];
+            for (int j=1; j<indices.length; ++j){
+                indices[j] = j;
+            }
+
+            long bestQE3 = Long.MAX_VALUE;
+            long bestQE4 = Long.MAX_VALUE;
 
             // Continue until every combination of i packages has been examined
             while (indices[0] <= packages.size() - i){
@@ -80,8 +49,11 @@ public class Main {
                 }
 
                 // If it's a new best quantum entanglement
-                if (total == weight && qe < QE){
-                    QE = qe;
+                if (total == weight / 3 && qe < bestQE3){
+                    bestQE3 = qe;
+                }
+                if (total == weight / 4 && qe < bestQE4){
+                    bestQE4 = qe;
                 }
 
                 // Change the combination starting at the end
@@ -103,9 +75,17 @@ public class Main {
                     indices[j] = indices[j-1] + 1;
                 }
             }
+
+            // Save the QEs that work
+            if (part1 == Long.MAX_VALUE){
+                part1 = bestQE3;
+            }
+            if (part2 == Long.MAX_VALUE){
+                part2 = bestQE4;
+            }
         }
 
         // Print the answer
-        System.out.println(QE);
+        Library.print(part1,part2,name);
     }
 }

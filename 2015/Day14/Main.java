@@ -1,43 +1,14 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 14 https://adventofcode.com/2015/day/14
-Input: https://adventofcode.com/2015/day/14/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 14: Reindeer Olympics";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The answer to the problem
-        int best = 0;
+        sc = Library.getScanner(args);
+        
         // An array list of reindeer with an int array of:
         // [speed, burstTime, cycleTime, distance, score]
         ArrayList<int[]> reindeer = new ArrayList<>();
@@ -58,12 +29,16 @@ public class Main {
             reindeer.add(deer);
         }
 
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
+
         // Loop through every second of the race
         for (int i=0; i<2503; ++i){
             // The furthest reindeer's distance
             int max = -1;
             // The indexes of the furthest deer
-            ArrayList<Integer> index = new ArrayList<>();
+            HashSet<Integer> index = new HashSet<>();
             // Loop through every deer
             for (int j=0; j<reindeer.size(); ++j){
                 // Grab the deer
@@ -93,17 +68,11 @@ public class Main {
         // Loop through every deer
         for (int[] deer : reindeer){
             // Part 1 finds the furthest deer after 2503 seconds
-            if (PART == 1){
-                best = Math.max(best,deer[3]);
-            }
-
-            // Part 2 finds the deer with the most points after 2503 seconds
-            if (PART == 2){
-                best = Math.max(best,deer[4]);
-            }
+            part1 = Math.max(part1,deer[3]);
+            part2 = Math.max(part2,deer[4]);
         }
 
         // Print the answer
-        System.out.println(best);
+        Library.print(part1,part2,name);
     }
 }

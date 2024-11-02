@@ -1,42 +1,14 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 13 https://adventofcode.com/2015/day/13
-Input: https://adventofcode.com/2015/day/13/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
 import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 13: Knights of the Dinner Table";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // All of the lines of input
         ArrayList<String[]> input = new ArrayList<>();
         // The names of all the people
@@ -56,12 +28,6 @@ public class Main {
                                     (line[2].equals("lose") ? "-" : "") + line[3]});
         }
         
-        // Part 1 finds the change of happiness for the optimal seating arrangement
-        // Part 2 adds you to the seating with happiness changes of 0
-        if (PART == 2){
-            people.add("you");
-        }
-
         // Create the happiness matrix
         int[][] happiness = Library.distMap(people,input,false);
         // Find the maximum happiness value
@@ -72,6 +38,20 @@ public class Main {
             }
         }
 
+        // Find the max happiness
+        int part1 = solve(people,happiness,max);
+        // Add yourself to the table
+        people.add("you");
+        // Recreate the dist map
+        happiness = Library.distMap(people,input,false);
+        // Fine the new max happiness
+        int part2 = solve(people,happiness,max);
+
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static int solve(ArrayList<String> people, int[][] happiness, int max){
         // The answer to the problem
         int best = 0;
         // The list of possible arrangements
@@ -122,7 +102,6 @@ public class Main {
             }
         }
 
-        // Print the answer
-        System.out.println(best);
+        return best;
     }
 }

@@ -1,41 +1,13 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 21 https://adventofcode.com/2015/day/21
-Input: https://adventofcode.com/2015/day/21/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 21: RPG Simulator 20XX";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // Take in all input, skipping unneeded information
         sc.next();
         sc.next();
@@ -103,11 +75,8 @@ public class Main {
         }
 
         // The answer to the problem, default to big or small depending
-        int cost = Integer.MAX_VALUE;
-
-        if (PART == 2){
-            cost = 0;
-        }
+        int part1 = Integer.MAX_VALUE;
+        int part2 = 0;
 
         // Loop through every stat
         for (int i=0; i<stats.size(); ++i){
@@ -134,24 +103,20 @@ public class Main {
                 youHP -= bossDamage;
             }
 
-            if (PART == 1){
-                // If you won and it was cheaper
-                if (bossHP <= 0 && stats.get(i)[0] < cost){
-                    // Save the cost
-                    cost = stats.get(i)[0];
-                }
+            // If you won and it was cheaper
+            if (bossHP <= 0 && stats.get(i)[0] < part1){
+                // Save the cost
+                part1 = stats.get(i)[0];
             }
 
-            if (PART == 2){
-                // If the boss won and it was more expensive
-                if (youHP <= 0 && stats.get(i)[0] > cost){
-                    // Save the cost
-                    cost = stats.get(i)[0];
-                }
+            // If the boss won and it was more expensive
+            if (youHP <= 0 && stats.get(i)[0] > part2){
+                // Save the cost
+                part2 = stats.get(i)[0];
             }
         }
 
         // Print the answer
-        System.out.println(cost);
+        Library.print(part1,part2,name);
     }
 }

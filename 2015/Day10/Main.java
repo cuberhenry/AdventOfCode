@@ -1,46 +1,21 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 10 https://adventofcode.com/2015/day/10
-Input: https://adventofcode.com/2015/day/10/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.BiHashMap;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 10: Elves Look, Elves Say";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // Take in the starting number
         String line = sc.next();
 
         // Create a hashmap for finding the quantity of each element initially
-        HashMap<String,String> sequences = new HashMap<>();
+        BiHashMap<String,String> sequences = new BiHashMap<>();
         sequences.put("22","H");
         sequences.put("13112221133211322112211213322112","He");
         sequences.put("312211322212221121123222112","Li");
@@ -260,17 +235,21 @@ public class Main {
                 }
             }
         }
-
-        // The number of steps to perform
-        int numLoops = 40;
         
-        // Part 1 finds the size of the result after 40 rounds
-        // Part 2 finds the size of the result after 50 rounds
-        if (PART == 2){
-            numLoops = 50;
-        }
+        // Perform 40 loops
+        int part1 = loop(numElements,40,sequences,decays,elements);
+        // Perform 10 more loops
+        int part2 = loop(numElements,10,sequences,decays,elements);
 
-        // Perform numLoops times
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static int loop(int[] numElements, int numLoops,
+                     BiHashMap<String,String> sequences,
+                     HashMap<String,String[]> decays,
+                     ArrayList<String> elements){
+        // Loop through numLoops times
         for (int i=0; i<numLoops; ++i){
             // The amount of each element in the next step
             int[] newElements = new int[numElements.length];
@@ -282,7 +261,9 @@ public class Main {
                 }
             }
             // Save the next amounts
-            numElements = newElements;
+            for (int j=0; j<newElements.length; ++j){
+                numElements[j] = newElements[j];
+            }
         }
 
         // The number of characters in the result
@@ -290,18 +271,9 @@ public class Main {
 
         // Loop through every element
         for (int i=0; i<numElements.length; ++i){
-            // Loop through every sequence in the set
-            for (String key : sequences.keySet()){
-                // If the set is from the current element
-                if (sequences.get(key).equals(elements.get(i))){
-                    // Add that many times the length of the element
-                    total += key.length() * numElements[i];
-                    break;
-                }
-            }
+            total += sequences.getReverse(elements.get(i)).length() * numElements[i];
         }
 
-        // Print the answer
-        System.out.println(total);
+        return total;
     }
 }

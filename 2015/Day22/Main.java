@@ -1,41 +1,14 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 22 https://adventofcode.com/2015/day/22
-Input: https://adventofcode.com/2015/day/22/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 22: Wizard Simulator 20XX";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // Get rid of excess information
         sc.next();
         sc.next();
@@ -49,15 +22,24 @@ public class Main {
         spells.add(new int[] {173,0,0,2,6});
         spells.add(new int[] {229,0,0,3,5});
 
+        // Get the boss' info
+        int bossHP = sc.nextInt();
+        sc.next();
+        int bossAttack = sc.nextInt();
+
+        // Simulate the battles
+        int part1 = battle(spells,bossHP,bossAttack,false);
+        int part2 = battle(spells,bossHP,bossAttack,true);
+
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static int battle(ArrayList<int[]> spells, int bossHP, int bossAttack, boolean hard){
         // The states left to check in a depth first search
         Stack<int[]> states = new Stack<>();
         // {cost, shield, poison, recharge, mana, youHP, bossHP}
-        states.add(new int[] {0,0,0,0,500,50,sc.nextInt()});
-
-        // Excess information
-        sc.next();
-        // Save the boss' attack
-        int bossAttack = sc.nextInt();
+        states.add(new int[] {0,0,0,0,500,50,bossHP});
 
         // The best solution so far
         int best = Integer.MAX_VALUE;
@@ -69,9 +51,8 @@ public class Main {
 
             // Pre player turn
 
-            // Part 1 finds the least amount of mana necessary to win
-            // Part 2 does the same but you lose one health every round
-            if (PART == 2){
+            // Lose health on hard mode
+            if (hard){
                 // Lose 1 HP
                 --state[5];
                 // If you lose, don't check this state anymore
@@ -116,7 +97,7 @@ public class Main {
                     continue;
                 }
                 // Create a new state
-                int[] newState = Arrays.copyOf(state,7);
+                int[] newState = state.clone();
                 // Add the spell cost to total mana spent
                 newState[0] += spell[0];
                 // Clip the branch if it passes the best
@@ -186,6 +167,6 @@ public class Main {
         }
 
         // Print the answer to the problem
-        System.out.println(best);
+        return best;
     }
 }

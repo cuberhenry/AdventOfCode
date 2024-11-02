@@ -1,42 +1,14 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 9 https://adventofcode.com/2015/day/9
-Input: https://adventofcode.com/2015/day/9/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
 import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 9: All in a Single Night";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // All lines of input
         ArrayList<String[]> input = new ArrayList<>();
         // The names of all of the cities
@@ -68,13 +40,8 @@ public class Main {
         }
 
         // The answer to the problem
-        int best = Integer.MAX_VALUE;
-
-        // Part 1 finds the shortest distance required to visit all cities
-        // Part 2 finds the longest distance to do the same
-        if (PART == 2){
-            best = 0;
-        }
+        int part1 = Integer.MAX_VALUE;
+        int part2 = 0;
 
         // The sets of possible paths
         Stack<String> states = new Stack<>();
@@ -91,23 +58,15 @@ public class Main {
             // Grab the distance
             int distance = Integer.parseInt(currState[0]);
 
-            // Prunes states whose distances are already longer than the best solution
-            if (PART == 1){
-                if (distance >= best){
-                    continue;
-                }
-            }
-
-            // Prune states whose distances can't beat the current max no matter what
-            if (PART == 2){
-                if (distance + (cities.size()-currState.length+1)*maxDist <= best){
-                    continue;
-                }
+            // Prunes states
+            if (distance >= part1 && distance + (cities.size()-currState.length+1)*maxDist <= part2){
+                continue;
             }
 
             // If it survived the pruning and it's a finished path, it's the new best
             if (currState.length-1 == cities.size()){
-                best = distance;
+                part1 = Math.min(part1,distance);
+                part2 = Math.max(part2,distance);
                 continue;
             }
 
@@ -126,6 +85,6 @@ public class Main {
         }
 
         // Print the answer
-        System.out.println(best);
+        Library.print(part1,part2,name);
     }
 }

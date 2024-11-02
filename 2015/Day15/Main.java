@@ -1,41 +1,13 @@
-/*
-Henry Anderson
-Advent of Code 2015 Day 15 https://adventofcode.com/2015/day/15
-Input: https://adventofcode.com/2015/day/15/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 15: Science for Hungry People";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+        
         // The list of all ingredients
         ArrayList<int[]> ingredients = new ArrayList<>();
 
@@ -76,6 +48,9 @@ public class Main {
             best *= attribute * 100;
         }
 
+        int part1 = best;
+        int part2 = best;
+
         // Loop until every possibility has been found
         while (amounts[0] != 100){
             // Increment
@@ -104,22 +79,6 @@ public class Main {
             // Make sure the number of ingredients always equals 100
             amounts[numIngredients-1] = 100 - sum;
 
-            // Part 1 finds the ideal cookie score using 100 ingredients
-            // Part 2 stipulates that the cookie must have 500 calories
-            if (PART == 2){
-                // The number of calories in this combination
-                int numCalories = 0;
-                // Loop through every ingredient
-                for (int i=0; i<numIngredients; ++i){
-                    // Add the number of calories contributed by that ingredient
-                    numCalories += ingredients.get(i)[4]*amounts[i];
-                }
-                // Only count combinations that are 500 calories
-                if (numCalories != 500){
-                    continue;
-                }
-            }
-
             // Calculate score
             // The score of the current combination
             int score = 1;
@@ -141,12 +100,22 @@ public class Main {
                 score *= total;
             }
             // If a new best is found, save it
-            if (score > best){
-                best = score;
+            part1 = Math.max(part1,score);
+
+            // The number of calories in this combination
+            int numCalories = 0;
+            // Loop through every ingredient
+            for (int i=0; i<numIngredients; ++i){
+                // Add the number of calories contributed by that ingredient
+                numCalories += ingredients.get(i)[4]*amounts[i];
+            }
+            // Only count combinations that are 500 calories
+            if (numCalories == 500){
+                part2 = Math.max(part2,score);
             }
         }
 
         // Print the answer
-        System.out.println(best);
+        Library.print(part1,part2,name);
     }
 }
