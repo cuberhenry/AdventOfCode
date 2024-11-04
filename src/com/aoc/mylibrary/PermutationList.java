@@ -11,34 +11,49 @@ public class PermutationList<E> implements Iterable<List<E>> {
         list = new ArrayList<>();
     }
 
-    public PermutationList(List<E> l){
-        list = l;
-    }
-
     public void add(E item){
         list.add(item);
     }
 
-    public Iterator<List<E>> iterator() {
-        return new PermutationIterator();
+    public void add(int index, E item){
+        list.add(index,item);
     }
-    
-    private class PermutationIterator implements Iterator<List<E>> {
-        private int index = 0;
 
-        public boolean hasNext(){
-            return index != (int)Math.pow(2,list.size());
-        }
+    public boolean contains(E item){
+        return list.contains(item);
+    }
 
-        public List<E> next(){
-            List<E> subset = new ArrayList<>();
-            for (int i=0; i<list.size(); ++i){
-                if (index / (int)Math.pow(2,i) % 2 == 1){
-                    subset.add(list.get(i));
+    public int size(){
+        return list.size();
+    }
+
+    public E get(int index){
+        return list.get(index);
+    }
+
+    public int indexOf(E item){
+        return list.indexOf(item);
+    }
+
+    public Iterator<List<E>> iterator() {
+        List<List<E>> permutations = new ArrayList<>();
+        permutations.add(new ArrayList<>());
+        permutations.getFirst().add(list.getFirst());
+
+        for (int i=1; i<list.size(); ++i){
+            List<List<E>> newPerms = new ArrayList<>();
+
+            for (int j=permutations.size()-1; j>=0; --j){
+                for (int k=permutations.get(j).size(); k>=0; --k){
+                    ArrayList<E> newPerm = new ArrayList<>(permutations.get(j));
+                    newPerm.add(k,list.get(i));
+                    newPerms.add(newPerm);
                 }
             }
-            ++index;
-            return subset;
+
+            permutations = newPerms;
         }
+
+        return permutations.iterator();
     }
 }

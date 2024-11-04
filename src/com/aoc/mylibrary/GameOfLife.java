@@ -2,7 +2,6 @@ package com.aoc.mylibrary;
 
 import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GameOfLife {
     private HashSet<ArrayState> alive;

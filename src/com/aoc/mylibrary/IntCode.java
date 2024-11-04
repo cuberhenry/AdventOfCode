@@ -18,11 +18,7 @@ public class IntCode {
     // Constructor
     public IntCode(String p){
         // Initialize the program based on the comma-delimited input
-        String[] split = p.split(",");
-        program = new long[split.length];
-        for (int i=0; i<split.length; ++i){
-            program[i] = Long.parseLong(split[i]);
-        }
+        program = Library.longSplit(p,",");
     }
 
     // Update the program at an index to a value

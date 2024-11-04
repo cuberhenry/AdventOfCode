@@ -141,6 +141,26 @@ public class Library {
         return intSplit;
     }
 
+    public static long[] longSplit(String string, String delim){
+        String[] split = string.split(delim);
+        long[] longSplit = new long[split.length];
+
+        for (int i=0; i<split.length; ++i){
+            longSplit[i] = Long.parseLong(split[i]);
+        }
+
+        return longSplit;
+    }
+
+    public static int indexOf(char[] array, char value){
+        for (int i=0; i<array.length; ++i){
+            if (array[i] == value){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static int maxIndex(int[] array){
         int index = 0;
         for (int i=1; i<array.length; ++i){
@@ -159,6 +179,16 @@ public class Library {
         return sum;
     }
 
+    public static String md5(String string, boolean fill){
+        String hash = md5(string);
+        if (fill){
+            while (hash.length() < 32){
+                hash = "0" + hash;
+            }
+        }
+        return hash;
+    }
+
     public static String md5(String string){
         // Create the hasher
         MessageDigest md;
@@ -170,6 +200,48 @@ public class Library {
         // Find the hash of the string
         md.update(string.getBytes(),0,string.length());
         return new BigInteger(1,md.digest()).toString(16);
+    }
+
+    public static String read(boolean[][] display){
+        HashMap<Integer,Character> letters = new HashMap<>();
+        letters.put(422068812,'C');
+        letters.put(1024344606,'E');
+        letters.put(623856210,'H');
+        letters.put(474091662,'I');
+        letters.put(203491916,'J');
+        letters.put(625758866,'K');
+        letters.put(554189342,'L');
+        letters.put(422136396,'O');
+        letters.put(959017488,'P');
+        letters.put(959017618,'R');
+        letters.put(623462988,'U');
+        letters.put(588583044,'Y');
+        letters.put(1008869918,'Z');
+        String text = "";
+        for (int i=0; i<display[0].length; i += 5){
+            int hash = 0;
+            for (int j=0; j<6; ++j){
+                for (int k=0; k<5; ++k){
+                    hash <<= 1;
+                    if (display[j][i+k]){
+                        ++hash;
+                    }
+                }
+            }
+            if (letters.containsKey(hash)){
+                text += letters.get(hash);
+            }else{
+                text = "ERROR: New Letter (" + hash + ")\n";
+                for (boolean[] row : display){
+                    for (int j=i; j<i+5; ++j){
+                        text += row[j] ? '#' : '.';
+                    }
+                    text += '\n';
+                }
+                break;
+            }
+        }
+        return text;
     }
 }
 

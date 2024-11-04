@@ -1,98 +1,46 @@
-/*
-Henry Anderson
-Advent of Code 2016 Day 14 https://adventofcode.com/2016/day/14
-Input: https://adventofcode.com/2016/day/14/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
-import java.security.*;
-import java.math.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 14: One-Time Pad";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // Take in the input
         String input = sc.next();
         // The index at which to start
         int index = 0;
 
         // The indeces of keys
-        ArrayList<Integer> indices = new ArrayList<>();
+        ArrayList<Integer> indices1 = new ArrayList<>();
+        ArrayList<Integer> indices2 = new ArrayList<>();
         // Possible keys: [index, character]
-        ArrayList<int[]> repetitions = new ArrayList<>();
-
-        // Create the hasher
-        MessageDigest md5;
-        try{
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (Exception e){
-            return;
-        }
+        ArrayList<int[]> repetitions1 = new ArrayList<>();
+        ArrayList<int[]> repetitions2 = new ArrayList<>();
 
         // Until a break is found
-        while (indices.size() < 64 || repetitions.size() > 0){
+        while (indices1.size() < 64 || !repetitions1.isEmpty() || indices2.size() < 64 || !repetitions2.isEmpty()){
             // Remove past repetitions
-            if (repetitions.size() > 0 && repetitions.get(0)[0] + 1000 < index){
-                repetitions.remove(0);
+            if (!repetitions1.isEmpty() && repetitions1.get(0)[0] + 1000 < index){
+                repetitions1.remove(0);
             }
-            // Create the hasher
-            MessageDigest md;
-            try{
-                md = MessageDigest.getInstance("MD5");
-            } catch (Exception e){
-                return;
+            if (!repetitions2.isEmpty() && repetitions2.get(0)[0] + 1000 < index){
+                repetitions2.remove(0);
             }
             // The input string
-            String string = input+index;
-            // Find the hash of the string
-            md.update(string.getBytes(),0,string.length());
-            String hash = new BigInteger(1,md.digest()).toString(16);
-            while (hash.length() < 32){
-                hash = 0 + hash;
-            }
-
-            // Part 1 finds the 64th time the hash meets the requirements
-            // Part 2 does the same, but takes the hash of the hash 2016 times
-            if (PART == 2){
-                for (int i=0; i<2016; ++i){
-                    // Find the hash of the string
-                    md5.update(hash.getBytes(),0,hash.length());
-                    hash = new BigInteger(1,md5.digest()).toString(16);
-                    while (hash.length() < 32){
-                        hash = 0 + hash;
-                    }
-                }
+            String hash = Library.md5(input + index,true);
+            String stretched = hash;
+            for (int i=0; i<2016; ++i){
+                // Find the hash of the string
+                stretched = Library.md5(stretched,true);
             }
 
             // The first sequence of three
-            int[] sequence = null;
+            int[] sequence1 = null;
+            int[] sequence2 = null;
             // Loop through every triplet of characters
             for (int i=0; i<hash.length()-2; ++i){
                 char c = hash.charAt(i);
@@ -101,24 +49,46 @@ public class Main {
                     // If the hash contains a sequence of five
                     if (i < hash.length()-4 && c == hash.charAt(i+3) && c == hash.charAt(i+4)){
                         // Loop through every hash that has a triplet
-                        for (int j=0; j<repetitions.size(); ++j){
+                        for (int j=repetitions1.size()-1; j>=0; --j){
                             // If the triplet matches the current five sequence
-                            if (repetitions.get(j)[1] == c){
+                            if (repetitions1.get(j)[1] == c){
                                 // Add it to the list of correct values
-                                indices.add(repetitions.remove(j)[0]);
-                                --j;
+                                indices1.add(repetitions1.remove(j)[0]);
                             }
                         }
                     }
                     // Save the first triplet sequence
-                    if (sequence == null && indices.size() < 64){
-                        sequence = new int[] {index,c};
+                    if (sequence1 == null && indices1.size() < 64){
+                        sequence1 = new int[] {index,c};
+                    }
+                }
+
+                c = stretched.charAt(i);
+                // If the three characters are the same
+                if (c == stretched.charAt(i+1) && c == stretched.charAt(i+2)){
+                    // If the hash contains a sequence of five
+                    if (i < stretched.length()-4 && c == stretched.charAt(i+3) && c == stretched.charAt(i+4)){
+                        // Loop through every hash that has a triplet
+                        for (int j=repetitions2.size()-1; j>=0; --j){
+                            // If the triplet matches the current five sequence
+                            if (repetitions2.get(j)[1] == c){
+                                // Add it to the list of correct values
+                                indices2.add(repetitions2.remove(j)[0]);
+                            }
+                        }
+                    }
+                    // Save the first triplet sequence
+                    if (sequence2 == null && indices2.size() < 64){
+                        sequence2 = new int[] {index,c};
                     }
                 }
             }
             // Add the sequence to repetitions
-            if (sequence != null){
-                repetitions.add(sequence);
+            if (sequence1 != null){
+                repetitions1.add(sequence1);
+            }
+            if (sequence2 != null){
+                repetitions2.add(sequence2);
             }
 
             // Increase the index
@@ -126,8 +96,13 @@ public class Main {
         }
 
         // Sort the list
-        Collections.sort(indices);
+        Collections.sort(indices1);
+        Collections.sort(indices2);
+
+        int part1 = indices1.get(63);
+        int part2 = indices2.get(63);
+
         // Print the 64th key
-        System.out.println(indices.get(63));
+        Library.print(part1,part2,name);
     }
 }

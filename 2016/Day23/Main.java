@@ -1,198 +1,28 @@
-/*
-Henry Anderson
-Advent of Code 2016 Day 23 https://adventofcode.com/2016/day/23
-Input: https://adventofcode.com/2016/day/23/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.Assembunny;
+import java.util.Scanner;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 23: Safe Cracking";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // The program to be run
-        ArrayList<String> instructions = new ArrayList<>();
-        // The four registers
-        int[] registers = new int[4];
-        
-        // Part 1 finds the value of register a when initialized to 7
-        if (PART == 1){
-            registers[0] = 7;
-        }
+        Assembunny program = new Assembunny(sc);
+        program.setRegister('a',7);
+        // Get the value in register a
+        program.run();
+        int part1 = program.getRegister('a');
 
-        // Part 2 finds the value of register a when initialized to 12
-        if (PART == 2){
-            registers[0] = 12;
-        }
-
-        // Take in the instructions
-        while (sc.hasNext()){
-            instructions.add(sc.nextLine());
-        }
-
-        // Until the program ends
-        for (int i=0; i<instructions.size(); ++i){
-            // Grab the current instruction
-            String[] instruction = instructions.get(i).split(" ");
-            // Perform the instruction
-            switch (instruction[0]){
-                // Copy
-                case "cpy" -> {
-                    // Skip nonsense instructions
-                    if (Character.isDigit(instruction[2].charAt(0))){
-                        continue;
-                    }
-                    // Can handle either a register or a value
-                    if (Character.isDigit(instruction[1].charAt(0)) || instruction[1].charAt(0) == '-'){
-                        // Set the register to the value
-                        registers[instruction[2].charAt(0)-'a'] = Integer.parseInt(instruction[1]);
-                    }else{
-                        // Set the register to the other register
-                        int value = registers[instruction[1].charAt(0)-'a'];
-                        registers[instruction[2].charAt(0)-'a'] = value;
-                    }
-                }
-                // Increment or Decrement
-                case "inc", "dec" -> {
-                    // Get the next instruction
-                    String next = instructions.get(i+1);
-                    // Check to see if it's being changed based on another number
-                    if (instructions.size() > i+2 && instructions.get(i+2).substring(0,3).equals("jnz")
-                        && (next.substring(0,3).equals("inc") || next.substring(0,3).equals("dec"))){
-                        // The register on which the current register is dependant
-                        char jump = instructions.get(i+2).split(" ")[1].charAt(0);
-                        // The register being changed
-                        char other = instruction[1].charAt(0);
-                        // Whether the current register is being increased or decreased
-                        int multi = instruction[0].equals("inc") ? 1 : -1;
-                        // If the current register is in charge of the jump
-                        if (other == jump){
-                            // Switch the registers
-                            other = next.charAt(4);
-                            multi = next.substring(0,3).equals("inc") ? 1 : -1;
-                        }
-                        // If it's a multiplication
-                        if (instructions.size() > i+4 && instructions.get(i+4).substring(0,3).equals("jnz")
-                            && (instructions.get(i+3).substring(0,3).equals("inc") || instructions.get(i+3).substring(0,3).equals("dec"))){
-                            // Multiply the two registers
-                            registers[jump-'a'] *= Math.abs(registers[instructions.get(i+3).charAt(4)-'a']);
-                            // Empty the second register
-                            registers[instructions.get(i+3).charAt(4)-'a'] = 0;
-                            // Move the answer to the right register
-                            registers[other-'a'] += registers[jump-'a'] * multi;
-                            registers[jump-'a'] = 0;
-                            // Skip the instructions that were condensed
-                            i += 4;
-                            // Continue to the next instruction
-                            continue;
-                        }
-                        // Add the registers
-                        registers[other-'a'] += registers[jump-'a'] * multi;
-                        // Empty the other register
-                        registers[jump-'a'] = 0;
-                        // Skip the instructions that were condensed
-                        i += 2;
-                        // Continue to the next instruction
-                        continue;
-                    }
-                    // Increment or decrement the value at the register
-                    registers[instruction[1].charAt(0)-'a'] += instruction[0].equals("inc") ? 1 : -1;
-                }
-                // Jump Not Zero
-                case "jnz" -> {
-                    // The number to be compared to 0
-                    int num;
-                    // Can handle either a register or a value
-                    if (Character.isDigit(instruction[1].charAt(0))){
-                        // Set the number to the value
-                        num = Integer.parseInt(instruction[1]);
-                    }else{
-                        // Set the number to the register
-                        num = registers[instruction[1].charAt(0)-'a'];
-                    }
-                    // If the number isn't 0
-                    if (num != 0){
-                        // Jump using the given offset
-                        int offset;
-                        // Can handle either a register or a value
-                        if (Character.isDigit(instruction[2].charAt(0)) || instruction[2].charAt(0) == '-'){
-                            // Set the number to the value
-                            offset = Integer.parseInt(instruction[2]);
-                        }else{
-                            // Set the number to the register
-                            offset = registers[instruction[2].charAt(0)-'a'];
-                        }
-                        i += offset-1;
-                    }
-                }
-                // Toggle
-                case "tgl" -> {
-                    // The offset to the toggled instruction
-                    int num;
-                    // Can handle either a register or a value
-                    if (Character.isDigit(instruction[1].charAt(0)) || instruction[1].charAt(0) == '-'){
-                        // Set the number to the value
-                        num = Integer.parseInt(instruction[1]);
-                    }else{
-                        // Set the number to the register
-                        num = registers[instruction[1].charAt(0)-'a'];
-                    }
-
-                    // Skips the instruction if tgl tries to toggle a nonexistent instruction
-                    if (i+num < 0 || i+num >= instructions.size()){
-                        continue;
-                    }
-                    // The instruction to be toggled
-                    String toggled = instructions.get(i + num);
-                    String[] split = toggled.split(" ");
-
-                    // Separates one and two argument instructions
-                    if (split.length == 2){
-                        // inc changes to dec and everything else changes to inc
-                        if (split[0].equals("inc")){
-                            instructions.set(i+num,"dec" + toggled.substring(3));
-                        }else{
-                            instructions.set(i+num,"inc" + toggled.substring(3));
-                        }
-                    }else{
-                        // jnz changes to cpy and everything else changes to jnz
-                        if (split[0].equals("jnz")){
-                            instructions.set(i+num,"cpy" + toggled.substring(3));
-                        }else{
-                            instructions.set(i+num,"jnz" + toggled.substring(3));
-                        }
-                    }
-                }
-            }
-        }
+        // Reset the program with 12 in register a
+        program.reset();
+        program.setRegister('a',12);
+        // Get the value in register a
+        program.run();
+        int part2 = program.getRegister('a');
 
         // Print the answer
-        System.out.println(registers[0]);
+        Library.print(part1,part2,name);
     }
 }

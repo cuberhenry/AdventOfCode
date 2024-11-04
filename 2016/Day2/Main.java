@@ -1,78 +1,45 @@
-/*
-Henry Anderson
-Advent of Code 2016 Day 2 https://adventofcode.com/2016/day/2
-Input: https://adventofcode.com/2016/day/2/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 2: Bathroom Security";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The password
-        String password = "";
-        // The keypad
-        char[][] keypad = {{}};
+        sc = Library.getScanner(args);
 
-        // The current position of the button, starting at the 5
-        int x = -1;
-        int y = -1;
-
-        // Part 1 uses a standard keypad
-        if (PART == 1){
-            keypad = new char[][] {{'1','2','3'},
-                                   {'4','5','6'},
-                                   {'7','8','9'}};
-            x = 1;
-            y = 1;
-        }
-        
-        // Part 2 uses a strange keypad
-        if (PART == 2){
-            keypad = new char[][] {{' ',' ','1',' ',' '},
-                                   {' ','2','3','4',' '},
-                                   {'5','6','7','8','9'},
-                                   {' ','A','B','C',' '},
-                                   {' ',' ','D',' ',' '}};
-            x = 0;
-            y = 2;
-        }
-
-        // Loop through every instruction
+        // Take in the instructions
+        ArrayList<String> instructions = new ArrayList<>();
         while (sc.hasNext()){
-            // Grab the line
-            String line = sc.next();
+            instructions.add(sc.nextLine());
+        }
+
+        // Default keypad
+        char[][] keypad = new char[][] {{'1','2','3'},
+                                        {'4','5','6'},
+                                        {'7','8','9'}};
+        String part1 = code(instructions,keypad,1,1);
+        // Strange keypad
+        keypad = new char[][] {{' ',' ','1',' ',' '},
+                               {' ','2','3','4',' '},
+                               {'5','6','7','8','9'},
+                               {' ','A','B','C',' '},
+                               {' ',' ','D',' ',' '}};
+        String part2 = code(instructions,keypad,0,2);
+
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static String code(ArrayList<String> instructions, char[][] keypad, int x, int y){
+        // The resulting password
+        String password = "";
+        // Loop through every instruction
+        for (String line : instructions){
             // Loop through every character in the line
-            for (int i=0; i<line.length(); ++i){
+            for (char c : line.toCharArray()){
                 // Move in the desired direction if possible
-                switch (line.charAt(i)){
+                switch (c){
                     case 'U' -> {
                         if (y > 0 && keypad[y-1][x] != ' '){
                             --y;
@@ -100,7 +67,6 @@ public class Main {
             password += keypad[y][x];
         }
 
-        // Print the answer
-        System.out.println(password);
+        return password;
     }
 }

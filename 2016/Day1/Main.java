@@ -1,53 +1,29 @@
-/*
-Henry Anderson
-Advent of Code 2016 Day 1 https://adventofcode.com/2016/day/1
-Input: https://adventofcode.com/2016/day/1/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.HashSet;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 1: No Time for a Taxicab";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+        
         // The list of instructions
         String[] input = sc.nextLine().split(", ");
         // Current position
-        int x = 0;
-        int y = 0;
+        int[] position = new int[2];
         // Current direction
         int direction = 0;
 
         // All visited positions
-        ArrayList<String> positions = new ArrayList<>();
+        HashSet<ArrayState> positions = new HashSet<>();
         // Add the starting position
-        positions.add("0 0");
+        positions.add(new ArrayState(position.clone()));
+
+        // The answer to the problem
+        int part1;
+        int part2 = -1;
 
         // Loop through every instruction
         for (String instruction : input){
@@ -61,42 +37,33 @@ public class Main {
             // Grab the distance to be travelled
             int distance = Integer.parseInt(instruction.substring(1));
 
-            // Part 1 finds the location at the end of the instructions
-            if (PART == 1){
-                // Move distance in direction
+            // Move distance in direction but keeping track of every position
+            for (int i=0; i<distance; ++i){
                 switch (direction){
-                    case 0 -> {y += distance;}
-                    case 1 -> {x += distance;}
-                    case 2 -> {y -= distance;}
-                    case 3 -> {x -= distance;}
+                    case 0 -> {++position[1];}
+                    case 1 -> {++position[0];}
+                    case 2 -> {--position[1];}
+                    case 3 -> {--position[0];}
                 }
-            }
 
-            // Part 2 finds the first location visited twice
-            if (PART == 2){
-                // Move distance in direction but keeping track of every position
-                for (int i=0; i<distance; ++i){
-                    switch (direction){
-                        case 0 -> {++y;}
-                        case 1 -> {++x;}
-                        case 2 -> {--y;}
-                        case 3 -> {--x;}
-                    }
-
+                // If the first intersection hasn't been found yet
+                if (part2 == -1){
                     // If visited before
-                    if (positions.contains(x+" "+y)){
-                        // Print the distance
-                        System.out.println(Math.abs(x)+Math.abs(y));
-                        return;
+                    if (positions.contains(new ArrayState(position))){
+                        // Save the distance
+                        part2 = Math.abs(position[0]) + Math.abs(position[1]);
+                    }else{
+                        // Add the current position
+                        positions.add(new ArrayState(position.clone()));
                     }
-
-                    // Add the current position
-                    positions.add(x+" "+y);
                 }
             }
         }
 
+        // Find the ending distance
+        part1 = Math.abs(position[0]) + Math.abs(position[1]);
+
         // Print the distance
-        System.out.println(Math.abs(x)+Math.abs(y));
+        Library.print(part1,part2,name);
     }
 }

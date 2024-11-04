@@ -1,63 +1,40 @@
-/*
-Henry Anderson
-Advent of Code 2016 Day 13 https://adventofcode.com/2016/day/13
-Input: https://adventofcode.com/2016/day/13/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 13: A Maze of Twisty Little Cubicles";
+    private static Scanner sc;
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        sc = Library.getScanner(args);
+
         // The input
         int number = sc.nextInt();
         // The breadth first search queue
-        ArrayList<String> queue = new ArrayList<>();
+        HashSet<ArrayState> history = new HashSet<>();
+        LinkedList<int[]> queue = new LinkedList<>();
         // Add the starting position
-        queue.add("1 1 0");
+        queue.add(new int[] {1,1,0});
+
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
 
         // Loop through every position until a break point is found
-        for (int i=0; i<queue.size(); ++i){
+        while (!queue.isEmpty()){
             // Grab the position and disect it
-            String[] position = queue.get(i).split(" ");
-            int a = Integer.parseInt(position[0]);
-            int b = Integer.parseInt(position[1]);
-            int dist = Integer.parseInt(position[2]);
+            int[] position = queue.remove();
+            int a = position[0];
+            int b = position[1];
+            int dist = position[2];
 
-            // Part 1 finds the distance to 31,39
-            // Part 2 finds the number of locations within 50 steps
-            if (PART == 2){
-                // Once all 50 distance locations have been found, quit
-                if (dist == 50){
-                    break;
-                }
+            if (dist < 50){
+                ++part2;
+            }else if (part1 != 0){
+                // If both problems have been solved, break
+                break;
             }
 
             // Loop through every direction
@@ -67,30 +44,20 @@ public class Main {
                 int y = b;
                 // Change direction based on j
                 switch (j){
-                    // Left
-                    case 0 -> {
-                        if (x == 0){
-                            continue;
-                        }
-                        --x;
-                    }
-                    // Up
-                    case 1 -> {
-                        if (y == 0){
-                            continue;
-                        }
-                        --y;
-                    }
-                    // Right
-                    case 2 -> {++x;}
-                    // Down
-                    case 3 -> {++y;}
+                    case 0 -> --x;
+                    case 1 -> --y;
+                    case 2 -> ++x;
+                    case 3 -> ++y;
+                }
+
+                // Non-negative rooms
+                if (x < 0 || y < 0){
+                    continue;
                 }
 
                 // Part 1's desired location
                 if (x == 31 && y == 39){
-                    System.out.println(dist+1);
-                    return;
+                    part1 = dist + 1;
                 }
 
                 // The value to examine
@@ -104,33 +71,24 @@ public class Main {
                         even = !even;
                     }
                     // Divide by 2
-                    val /= 2;
+                    val >>= 1;
                 }
 
                 // If it's an open spot
                 if (even){
-                    // Get the position
-                    String str = x + " " + y + " " ;
-                    // Whether the position has been found
-                    boolean contains = false;
-                    // Loop through every previous visited spot
-                    for (String point : queue){
-                        // If they have the same x and y
-                        if (point.indexOf(str) == 0){
-                            // Don't add it
-                            contains = true;
-                            break;
-                        }
-                    }
-                    // Add the new location
-                    if (!contains){
-                        queue.add(str + (dist+1));
+                    // The new position
+                    ArrayState state = new ArrayState(new int[] {x,y});
+                    // If it's unvisited
+                    if (!history.contains(state)){
+                        // Look in that direction
+                        history.add(state);
+                        queue.add(new int[] {x,y,dist+1});
                     }
                 }
             }
         }
 
-        // Print Part 1's answer
-        System.out.println(queue.size());
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }
