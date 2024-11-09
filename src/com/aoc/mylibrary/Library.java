@@ -5,15 +5,18 @@ package com.aoc.mylibrary;
  * <a href="https://adventofcode.com/">Advent Of Code</a>
  * puzzles.
  */
+import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Queue;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Scanner;
+
 public class Library {
     public static Scanner getScanner(String[] args){
         try {
@@ -23,6 +26,50 @@ public class Library {
             System.exit(1);
             return null;
         }
+    }
+
+    public static String getString(String[] args){
+        try {
+            return Files.readString(Paths.get(args.length == 0 ? "input.txt" : args[0])).trim();
+        }catch (Exception e){
+            System.out.println("File not found");
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String[] getStringArray(String[] args, String delim){
+        return getString(args).split(delim);
+    }
+
+    public static int getInt(String[] args){
+        return Integer.parseInt(getString(args));
+    }
+
+    public static int[] getIntArray(String[] args, String delim){
+        return intSplit(getString(args),delim);
+    }
+
+    public static char[][] getCharMatrix(String[] args){
+        Scanner sc = getScanner(args);
+        ArrayList<String> input = new ArrayList<>();
+        while (sc.hasNext()){
+            input.add(sc.nextLine());
+        }
+        char[][] grid = new char[input.size()][input.getFirst().length()];
+        for (int i=0; i<input.size(); ++i){
+            grid[i] = input.get(i).toCharArray();
+        }
+        return grid;
+    }
+
+    public static String[][] getAssembly(String[] args){
+        String[] lines = getStringArray(args,"\n");
+        String[][] assembly = new String[lines.length][];
+        for (int i=0; i<lines.length; ++i){
+            assembly[i] = lines[i].split(" ");
+        }
+        return assembly;
     }
 
     public static void print(long part1, long part2, String name){
@@ -130,6 +177,17 @@ public class Library {
         return string.substring(start,end);
     }
 
+    public static String pad(String string, char c, int length, boolean left){
+        while (string.length() < length){
+            if (left){
+                string = c + string;
+            }else{
+                string += c;
+            }
+        }
+        return string;
+    }
+
     public static int[] intSplit(String string, String delim){
         String[] split = string.split(delim);
         int[] intSplit = new int[split.length];
@@ -179,13 +237,17 @@ public class Library {
         return sum;
     }
 
+    public static int absSum(int[] array){
+        int sum = 0;
+        for (int num : array){
+            sum += Math.abs(num);
+        }
+        return sum;
+    }
+
     public static String md5(String string, boolean fill){
         String hash = md5(string);
-        if (fill){
-            while (hash.length() < 32){
-                hash = "0" + hash;
-            }
-        }
+        pad(hash,'0',32,true);
         return hash;
     }
 
@@ -200,6 +262,72 @@ public class Library {
         // Find the hash of the string
         md.update(string.getBytes(),0,string.length());
         return new BigInteger(1,md.digest()).toString(16);
+    }
+
+    public static String knotHash(String input){
+        // The list of numbers
+        int[] list = new int[256];
+        for (int i=1; i<list.length; ++i){
+            list[i] = i;
+        }
+        // The values to be carried over between twists
+        int skip = 0;
+        int position = 0;
+
+        // Add the extra turns
+        input += "\021\037I/\027";
+        // Create the list of lengths based on the ascii characters
+        int[] lengths = input.chars().toArray();
+        // Perform the twists 64 times
+        for (int i=0; i<64; ++i){
+            position = knotHashRotation(list,lengths,position,skip);
+            skip += lengths.length;
+        }
+        
+        // Create the hash
+        String hash = "";
+        // Loop through every dense value
+        for (int i=0; i<16; ++i){
+            // Create the dense value by XORing each one
+            int value = list[i*16];
+            for (int j=1; j<16; ++j){
+                value ^= list[i*16+j];
+            }
+
+            // Add the hex
+            hash += pad(Integer.toHexString(value),'0',2,true);
+        }
+
+        return hash;
+    }
+
+    public static int knotHashRotation(int[] list, int[] lengths, int position, int skip){
+        // Loop through every length
+        for (int length : lengths){
+            // Skip small numbers
+            if (length < 2){
+                position = (position + length + skip) % 256;
+                ++skip;
+                continue;
+            }
+            // Get the start and end positions of the reversed section
+            int start = position;
+            int end = position + length - 1;
+
+            // Reverse the section
+            for (int i=0; i<(end-start+1)/2; ++i){
+                // Switch the two numbers
+                int help = list[(start + i) % 256];
+                list[(start + i) % 256] = list[(end - i) % 256];
+                list[(end - i) % 256] = help;
+            }
+
+            // Change the current position
+            position = (position + length + skip) % 256;
+            // Increment the skip
+            ++skip;
+        }
+        return position;
     }
 
     public static String read(boolean[][] display){
@@ -247,22 +375,6 @@ public class Library {
 
 /*
  * dmnqstvwx
- *
- * 2016 Day 8 Part 2 Main
- * ####   ## #  # ###  #  #  ##  ###  #    #   #  ## 
- *    #    # #  # #  # # #  #  # #  # #    #   #   # 
- *   #     # #### #  # ##   #    #  # #     # #    # 
- *  #      # #  # ###  # #  #    ###  #      #     # 
- * #    #  # #  # # #  # #  #  # #    #      #  #  # 
- * ####  ##  #  # #  # #  #  ##  #    ####   #   ##  
- * 
- * 2016 Day 8 Part 2 Alt
- * ###  #  # ###  #  #  ##  ####  ##  ####  ### #    
- * #  # #  # #  # #  # #  # #    #  # #      #  #    
- * #  # #  # #  # #  # #    ###  #  # ###    #  #    
- * ###  #  # ###  #  # #    #    #  # #      #  #    
- * # #  #  # # #  #  # #  # #    #  # #      #  #    
- * #  #  ##  #  #  ##   ##  ####  ##  ####  ### #### 
  * 
  * 2018 Day 10 Part 1 Main
  * #####   #        ####   #    #  #    #  #####      ###   #### 

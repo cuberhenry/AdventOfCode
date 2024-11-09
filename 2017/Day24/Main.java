@@ -1,52 +1,24 @@
-/*
-Henry Anderson
-Advent of Code 2017 Day 24 https://adventofcode.com/2017/day/24
-Input: https://adventofcode.com/2017/day/24/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
-    public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+    final private static String name = "Day 24: Electromagnetic Moat";
+    public static void main(String[] args){
+        Scanner sc = Library.getScanner(args);
+
         // All of the available parts
         ArrayList<int[]> parts = new ArrayList<>();
         while (sc.hasNext()){
-            String[] split = sc.nextLine().split("/");
-            parts.add(new int[] {Integer.parseInt(split[0]),Integer.parseInt(split[1])});
+            parts.add(Library.intSplit(sc.nextLine(),"/"));
         }
 
         // The pieces currently making up the bridge
         Stack<int[]> bridge = new Stack<>();
         // The strongest bridge
-        int strongest = 0;
+        int part1 = 0;
+        int part2 = 0;
         // The longest bridge
         int longest = 0;
 
@@ -88,22 +60,16 @@ public class Main {
                 break;
             }
 
-            // Part 1 finds the strength of the strongest bridge
-            if (PART == 1){
-                strongest = Math.max(strongest,size);
-            }
-
-            // Part 2 finds the strength of the strongest longest bridge
-            if (PART == 2){
-                // If the bridge is longer
-                if (bridge.size() > longest){
-                    // Override the strength
-                    longest = bridge.size();
-                    strongest = size;
-                }else if (bridge.size() == longest){
-                    // If they're the same, choose the strongest
-                    strongest = Math.max(strongest,size);
-                }
+            // Save the strongest bridge
+            part1 = Math.max(part1,size);
+            // If the bridge is longer
+            if (bridge.size() > longest){
+                // Override the strength
+                longest = bridge.size();
+                part2 = size;
+            }else if (bridge.size() == longest){
+                // If they're the same, choose the strongest
+                part2 = Math.max(part2,size);
             }
 
             // All pieces have been examined, back out one piece
@@ -121,6 +87,6 @@ public class Main {
         }
 
         // Print the answer
-        System.out.println(strongest);
+        Library.print(part1,part2,name);
     }
 }

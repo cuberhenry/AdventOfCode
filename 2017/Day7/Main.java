@@ -1,160 +1,114 @@
-/*
-Henry Anderson
-Advent of Code 2017 Day 7 https://adventofcode.com/2017/day/7
-Input: https://adventofcode.com/2017/day/7/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 7: Recursive Circus";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+        
         // The input as an arraylist
-        ArrayList<String> programs = new ArrayList<>();
+        ArrayList<String[]> programs = new ArrayList<>();
+        // The weight of each program
+        HashMap<String,Integer> weights = new HashMap<>();
+        // The weight of each sub-tower
+        HashMap<String,Integer> towers = new HashMap<>();
         // Take in every line of input
         while (sc.hasNext()){
-            programs.add(sc.nextLine());
+            // Get the program's info
+            String[] split = sc.nextLine().split(" \\(|\\) -> |, |\\)");
+            int weight = Integer.parseInt(split[1]);
+            // Program has no children
+            if (split.length == 2){
+                // Its tower weight is known
+                towers.put(split[0],weight);
+            }else{
+                // Save for later
+                programs.add(split);
+            }
+            // Save its weight
+            weights.put(split[0],weight);
         }
 
-        // Part 1 finds the bottom program
-        if (PART == 1){
-            // The index of the current program
-            int index = 0;
-            // Look through every program
-            for (int i=0; i<programs.size(); ++i){
-                // Skip the current program and any leaf programs
-                if (index == i || programs.get(i).indexOf('>') == -1){
-                    continue;
-                }
+        // The answer to the problem
+        String part1 = "";
+        int part2 = 0;
 
-                // If the current program is on a disc of this program
-                if (programs.get(i).contains(programs.get(index).substring(0,programs.get(index).indexOf(' ')))){
-                    // Updated this program to the current program
-                    index = i;
-                    // Start over
-                    i = -1;
-                }
-            }
+        // Loop through every remaining program
+        for (int i=0; !programs.isEmpty(); i=(i+1)%Math.max(1,programs.size())){
+            String[] program = programs.get(i);
 
-            // Print the name of the current program
-            System.out.println(programs.get(index).split(" ")[0]);
-        }
-
-        // Part 2 finds the corrected size of the imbalanced program
-        if (PART == 2){
-            // The original sizes of all of the programs
-            HashMap<String,Integer> original = new HashMap<>();
-            // The adjusted weights of the programs including the programs they're holding
-            HashMap<String,Integer> updated = new HashMap<>();
-            // Loop through every program
-            for (int i=0; i<programs.size(); ++i){
-                // Collect the program and its relevant information
-                String program = programs.get(i);
-                String name = program.substring(0,program.indexOf(' '));
-                int weight = Integer.parseInt(program.substring(program.indexOf('(')+1,program.indexOf(')')));
-                // Add it to the original list
-                original.put(name,weight);
-                // If the program doesn't have any children
-                if (program.indexOf('-') == -1){
-                    // Add it to the updated list
-                    updated.put(name,weight);
-                    // Remove the program from the unknown list
-                    programs.remove(i);
-                    --i;
+            // Whether all children have been calculated
+            boolean containsAll = true;
+            // Loop through every child
+            for (int j=2; j<program.length; ++j){
+                // If it's not been calculated
+                if (!towers.containsKey(program[j])){
+                    // Quit
+                    containsAll = false;
+                    break;
                 }
             }
-            
-            // Loop through all programs until they have all been placed
-            for (int i=0; programs.size()>0; i=(i+1)%programs.size()){
-                // Collect the program and its relevant information
-                String program = programs.get(i);
-                String name = program.substring(0,program.indexOf(' '));
-                String[] subprograms = program.substring(program.indexOf('>')+2).split(", ");
-                // Whether or not all of its children have been accounted for
-                boolean containsAll = true;
+            if (!containsAll){
+                continue;
+            }
 
-                // Loop through every child
-                for (String sub : subprograms){
-                    // If it's not been updated
-                    if (!updated.containsKey(sub)){
-                        // Quit
-                        containsAll = false;
+            // After the incorrect weight is found, weights don't matter
+            if (part2 != 0){
+                // Save the newest name
+                part1 = program[0];
+                // Put a filler value in
+                towers.put(part1,0);
+                programs.remove(i);
+                continue;
+            }
+
+            // The size of the first child
+            int size = towers.get(program[2]);
+            // The index of the incorrect child
+            int index = 3;
+            // The size of the incorrect child
+            int other = towers.get(program[3]);
+            // If the two sizes are the same
+            if (size == other){
+                // Loop through every remaining child
+                for (int j=4; j<program.length; ++j){
+                    // If the size isn't the same
+                    if (towers.get(program[j]) != size){
+                        // It's the incorrect program
+                        other = towers.get(program[j]);
+                        // Save the index
+                        index = j;
                         break;
                     }
                 }
-                if (!containsAll){
+                // If all of the programs are the same weights
+                if (size == other){
+                    // Add it to the found
+                    towers.put(program[0],weights.get(program[0]) + size * (program.length-2));
+                    // Remove it from the unfound
+                    programs.remove(i);
                     continue;
                 }
-
-                // The size of the first child
-                int size = updated.get(subprograms[0]);
-                // The index of the incorrect child
-                int index = 1;
-                // The size of the incorrect child
-                int other = updated.get(subprograms[1]);
-                // If the two sizes are the same
-                if (size == other){
-                    // Loop through every remaining child
-                    for (int j=2; j<subprograms.length; ++j){
-                        // If the size isn't the same
-                        if (updated.get(subprograms[j]) != size){
-                            // It's the incorrect program
-                            other = updated.get(subprograms[j]);
-                            // Save the index
-                            index = j;
-                            break;
-                        }
-                    }
-                    // If all of the programs are the same weights
-                    if (size == other){
-                        // Add it to the found
-                        updated.put(name,original.get(name) + size * subprograms.length);
-                        // Remove it from the unfound
-                        programs.remove(i);
-                        continue;
-                    }
-                }else{
-                    // The weight of the third program
-                    int third = updated.get(subprograms[2]);
-                    // If the first program is the odd one out
-                    if (third == other){
-                        // Switch first and other
-                        index = 0;
-                        other = size;
-                        size = third;
-                    }
+            }else{
+                // The weight of the third program
+                int third = towers.get(program[4]);
+                // If the first program is the odd one out
+                if (third == other){
+                    // Switch first and other
+                    index = 2;
+                    other = size;
+                    size = third;
                 }
-                // Print the original weight of the program adjusted by the size difference of its siblings
-                System.out.println(original.get(subprograms[index]) + size - other);
-                return;
             }
+                
+            // Update the desired size
+            part2 = weights.get(program[index]) + size - other;
+            towers.put(program[0],0);
         }
+
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

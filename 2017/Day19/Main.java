@@ -1,76 +1,40 @@
-/*
-Henry Anderson
-Advent of Code 2017 Day 19 https://adventofcode.com/2017/day/19
-Input: https://adventofcode.com/2017/day/19/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
-    public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // Take in the entire input
-        ArrayList<String> map = new ArrayList<>();
-        while (sc.hasNext()){
-            map.add(sc.nextLine());
-        }
+    final private static String name = "Day 19: A Series of Tubes";
+    public static void main(String[] args){
+        // Get the map
+        char[][] map = Library.getCharMatrix(args);
 
         // The starting position
         int y = 0;
-        int x = map.get(0).indexOf('|');
+        int x = Library.indexOf(map[0],'|');
         // The starting direction (down)
         int dir = 2;
         // The answers to Parts 1 and 2 respectively
-        String answer = "";
-        int steps = 0;
+        String part1 = "";
+        int part2 = 0;
 
         // Continue travelling until the end of the path is reached
-        while (y >= 0 && x >= 0 && y < map.get(0).length() && x < map.get(0).length() && map.get(y).charAt(x) != ' '){
+        while (y >= 0 && x >= 0 && y < map.length && x < map[0].length && map[y][x] != ' '){
             // If the current position is a letter, add it to answer
-            if (Character.isLetter(map.get(y).charAt(x))){
-                answer += map.get(y).charAt(x);
+            if (Character.isLetter(map[y][x])){
+                part1 += map[y][x];
             }
 
             // If the current position is a crossroads
-            if (map.get(y).charAt(x) == '+'){
+            if (map[y][x] == '+'){
                 // Determine the new direction based on adjacent characters and the current direction
-                if (y > 0 && map.get(y-1).charAt(x) != ' ' && dir != 2){
+                if (y > 0 && map[y-1][x] != ' ' && dir != 2){
                     // Start going up
                     dir = 0;
-                }else if (x < map.get(y).length()-1 && map.get(y).charAt(x+1) != ' ' && dir != 3){
+                }else if (x < map[y].length-1 && map[y][x+1] != ' ' && dir != 3){
                     // Start going right
                     dir = 1;
-                }else if (y < map.size()-1 && map.get(y+1).charAt(x) != ' ' && dir != 0){
+                }else if (y < map.length-1 && map[y+1][x] != ' ' && dir != 0){
                     // Start going down
                     dir = 2;
-                }else if (x > 0 && map.get(y).charAt(x-1) != ' ' && dir != 1){
+                }else{
                     // Start going left
                     dir = 3;
                 }
@@ -84,17 +48,10 @@ public class Main {
                 case 3 -> {--x;}
             }
             // Increment the number of steps taken
-            ++steps;
+            ++part2;
         }
-
-        // Part 1 finds the order of characters passed through
-        if (PART == 1){
-            System.out.println(answer);
-        }
-
-        // Part 2 finds the number of steps taken to complete the path
-        if (PART == 2){
-            System.out.println(steps);
-        }
+        
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

@@ -1,46 +1,11 @@
-/*
-Henry Anderson
-Advent of Code 2017 Day 25 https://adventofcode.com/2017/day/25
-Input: https://adventofcode.com/2017/day/25/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
-    public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // Part 2 doesn't require code
-        if (PART == 2){
-            System.out.println("Reboot the Printer");
-            return;
-        }
+    final private static String name = "Day 25: The Halting Problem";
+    public static void main(String[] args){
+        Scanner sc = Library.getScanner(args);
         
         // The list of possible states
         ArrayList<int[][]> states = new ArrayList<>();
@@ -91,7 +56,13 @@ public class Main {
             state = instructions[2];
         }
 
+        // The number of 1s
+        int part1 = ones.size();
+
+        // Part 2 doesn't require code
+        String part2 = "Reboot the Printer";
+
         // Print the answer
-        System.out.println(ones.size());
+        Library.print(part1,part2,name);
     }
 }

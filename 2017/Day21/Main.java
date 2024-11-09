@@ -1,41 +1,13 @@
-/*
-Henry Anderson
-Advent of Code 2017 Day 21 https://adventofcode.com/2017/day/21
-Input: https://adventofcode.com/2017/day/21/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
-    public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+    final private static String name = "Day 21: Fractal Art";
+    public static void main(String[] args){
+        Scanner sc = Library.getScanner(args);
+
         //The rules as a hashmap, including all iterations of a square
         HashMap<String,String> rules = new HashMap<>();
         // Take in every rule
@@ -97,16 +69,23 @@ public class Main {
         grid.add("..#");
         grid.add("###");
 
-        // Part 1 finds the number of on pixels after 5 iterations
-        int iterations = 5;
-
-        // Part 2 finds the number of on pixels after 18 iterations
-        if (PART == 2){
-            iterations = 18;
-        }
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
 
         // Loop through every iteration
-        for (int i=0; i<iterations; ++i){
+        for (int i=0; i<18; ++i){
+            // Find the number of pixels after 5 iterations
+            if (i == 5){
+                for (String row : grid){
+                    for (char c : row.toCharArray()){
+                        if (c == '#'){
+                            ++part1;
+                        }
+                    }
+                }
+            }
+
             // Get the size of each split square based on the size of the grid
             int mod = grid.size() % 2 == 0 ? 2 : 3;
             ArrayList<String> newGrid = new ArrayList<>();
@@ -141,16 +120,15 @@ public class Main {
         }
 
         // Count the number of on pixels
-        int count = 0;
         for (String row : grid){
             for (int i=0; i<row.length(); ++i){
                 if (row.charAt(i) == '#'){
-                    ++count;
+                    ++part2;
                 }
             }
         }
 
         // Print the answer
-        System.out.println(count);
+        Library.print(part1,part2,name);
     }
 }
