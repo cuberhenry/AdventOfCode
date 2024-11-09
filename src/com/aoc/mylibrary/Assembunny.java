@@ -1,25 +1,19 @@
 package com.aoc.mylibrary;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 public class Assembunny {
-    private ArrayList<String[]> origInstructions = new ArrayList<>();
-    private ArrayList<String[]> instructions = new ArrayList<>();
+    private String[][] origInstructions;
+    private String[][] instructions;
     int[] registers = new int[4];
     int index = 0;
 
-    public Assembunny(Scanner sc){
-        while (sc.hasNext()){
-            String[] instruction = sc.nextLine().split(" ");
-            origInstructions.add(instruction);
-            instructions.add(instruction.clone());
-        }
+    public Assembunny(String[] args){
+        instructions = Library.getAssembly(args);
+        origInstructions = Library.getAssembly(args);
     }
 
     public void reset(){
-        for (int i=0; i<instructions.size(); ++i){
-            instructions.set(i,origInstructions.get(i).clone());
+        for (int i=0; i<instructions.length; ++i){
+            instructions[i] = origInstructions[i].clone();
         }
         registers = new int[4];
         index = 0;
@@ -39,9 +33,9 @@ public class Assembunny {
 
     public int run(){
         // Until the program ends
-        while (index < instructions.size()){
+        while (index < instructions.length){
             // Grab the current instruction
-            String[] instruction = instructions.get(index);
+            String[] instruction = instructions[index];
             // Perform the instruction
             switch (instruction[0]){
                 // Copy
@@ -58,13 +52,13 @@ public class Assembunny {
                 // Increment or Decrement
                 case "inc", "dec" -> {
                     // Get the next instruction
-                    String[] next = instructions.get(index+1);
+                    String[] next = instructions[index+1];
                     // Check to see if it's being changed based on another number
-                    if (instructions.size() > index+2 && instructions.get(index+2)[0].equals("jnz")
+                    if (instructions.length > index+2 && instructions[index+2][0].equals("jnz")
                         && (next[0].equals("inc") || next[0].equals("dec")
-                        && instructions.get(index+2)[2].equals("-2"))){
+                        && instructions[index+2][2].equals("-2"))){
                         // The register on which the current register is dependant
-                        char jump = instructions.get(index+2)[1].charAt(0);
+                        char jump = instructions[index+2][1].charAt(0);
                         // The register being changed
                         char other = instruction[1].charAt(0);
                         // Whether the current register is being increased or decreased
@@ -76,12 +70,12 @@ public class Assembunny {
                             multi = next[0].equals("inc") ? 1 : -1;
                         }
                         // If it's a multiplication
-                        if (instructions.size() > index+4 && instructions.get(index+4)[0].equals("jnz")
-                            && (instructions.get(index+3)[0].equals("inc") || instructions.get(index+3)[0].equals("dec"))){
+                        if (instructions.length > index+4 && instructions[index+4][0].equals("jnz")
+                            && (instructions[index+3][0].equals("inc") || instructions[index+3][0].equals("dec"))){
                             // Multiply the two registers
-                            registers[jump-'a'] *= Math.abs(registers[instructions.get(index+3)[1].charAt(0)-'a']);
+                            registers[jump-'a'] *= Math.abs(registers[instructions[index+3][1].charAt(0)-'a']);
                             // Empty the second register
-                            registers[instructions.get(index+3)[1].charAt(0)-'a'] = 0;
+                            registers[instructions[index+3][1].charAt(0)-'a'] = 0;
                             // Move the answer to the right register
                             registers[other-'a'] += registers[jump-'a'] * multi;
                             registers[jump-'a'] = 0;
@@ -122,12 +116,12 @@ public class Assembunny {
                     int num = getValue(instruction[1]);
 
                     // Skips the instruction if tgl tries to toggle a nonexistent instruction
-                    if (index+num < 0 || index+num >= instructions.size()){
+                    if (index+num < 0 || index+num >= instructions.length){
                         ++index;
                         continue;
                     }
                     // The instruction to be toggled
-                    String[] toggled = instructions.get(index + num);
+                    String[] toggled = instructions[index + num];
 
                     // Separates one and two argument instructions
                     if (toggled.length == 2){

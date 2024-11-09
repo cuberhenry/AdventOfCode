@@ -1,15 +1,11 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 import java.util.LinkedList;
 
 public class Main {
     final private static String name = "Day 17: Two Steps Forward";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The password for the hashes
-        String password = sc.next();
+        String password = Library.getString(args);
         // Breadth first search
         LinkedList<int[]> coordinates = new LinkedList<>();
         LinkedList<String> queue = new LinkedList<>();

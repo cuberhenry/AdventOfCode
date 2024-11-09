@@ -1,14 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 19: An Elephant Named Joseph";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The number of elves in the circle
-        int number = sc.nextInt();
+        int number = Library.getInt(args);
         
         // The answer to the problem
         // Josephus problem

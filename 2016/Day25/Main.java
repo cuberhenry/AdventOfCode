@@ -1,17 +1,13 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.Assembunny;
 import com.aoc.mylibrary.ArrayState;
-import java.util.Scanner;
 import java.util.HashSet;
 
 public class Main {
     final private static String name = "Day 25: Clock Signal";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The program to be run
-        Assembunny program = new Assembunny(sc);
+        Assembunny program = new Assembunny(args);
 
         // The answer to the problem
         int part1 = -1;

@@ -1,16 +1,12 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Main {
     final private static String name = "Day 14: One-Time Pad";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // Take in the input
-        String input = sc.next();
+        String input = Library.getString(args);
         // The index at which to start
         int index = 0;
 

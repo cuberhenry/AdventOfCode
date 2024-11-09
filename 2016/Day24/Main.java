@@ -1,7 +1,6 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
 import com.aoc.mylibrary.PermutationList;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,75 +8,55 @@ import java.util.List;
 
 public class Main {
     final private static String name = "Day 24: Air Duct Spelunking";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The map of whether each point is accessible
-        ArrayList<boolean[]> map = new ArrayList<>();
+        char[][] map = Library.getCharMatrix(args);
         // The list of destinations
         ArrayList<ArrayState> dests = new ArrayList<>();
-        // The robot's starting point
-        int startX = 0;
-        int startY = 0;
 
         // Loop through the whole map
-        while (sc.hasNext()){
-            // Take in the line
-            String line = sc.nextLine();
-            boolean[] row = new boolean[line.length()];
-
-            // Loop through every value
-            for (int i=0; i<line.length(); ++i){
-                if (line.charAt(i) == '.'){
-                    // Passable
-                    row[i] = true;
-                }else if (Character.isDigit(line.charAt(i))){
-                    // Passable and destination
-                    row[i] = true;
-                    if (line.charAt(i) == '0'){
-                        // startX = i;
-                        // startY = map.size();
-                        dests.add(0,new ArrayState(new int[] {i,map.size()}));
+        for (int i=0; i<map.length; ++i){
+            for (int j=0; j<map[i].length; ++j){
+                if (Character.isDigit(map[i][j])){
+                    if (map[i][j] == '0'){
+                        dests.add(0,new ArrayState(new int[] {j,i}));
                     }else{
-                        dests.add(new ArrayState(new int[] {i,map.size()}));
+                        dests.add(new ArrayState(new int[] {j,i}));
                     }
                 }
             }
-            map.add(row);
         }
 
         // Fill in dead ends
         // Loop through every square
-        for (int i=1; i<map.get(0).length-1; ++i){
-            for (int j=1; j<map.size()-1; ++j){
+        for (int i=1; i<map.length-1; ++i){
+            for (int j=1; j<map[0].length-1; ++j){
                 // Skip walls, destinations, and your starting point
-                if (!map.get(j)[i] || dests.contains(new ArrayState(new int[] {i,j}))
-                                   || (i == startX && j == startY)){
+                if (map[i][j] != '.'){
                     continue;
                 }
                 // The number of adjacent walls
                 int count = 0;
-                if (!map.get(j)[i-1]){
+                if (map[i][j-1] == '#'){
                     ++count;
                 }
-                if (!map.get(j)[i+1]){
+                if (map[i][j+1] == '#'){
                     ++count;
                 }
-                if (!map.get(j-1)[i]){
+                if (map[i-1][j] == '#'){
                     ++count;
                 }
-                if (!map.get(j+1)[i]){
+                if (map[i+1][j] == '#'){
                     ++count;
                 }
 
                 // If there are three adjacent walls, this is a dead end
                 if (count >= 3){
                     // Count it as a wall
-                    map.get(j)[i] = false;
+                    map[i][j] = '#';
                     // Back up enough to check the surrounding area
                     --i;
-                    j -= 2;
+                    --j;
                 }
             }
         }
@@ -119,7 +98,7 @@ public class Main {
                         }
                         ArrayState newPos = new ArrayState(new int[] {newX,newY});
                         // If it's an unvisited and non-wall spot
-                        if (!visited.contains(newPos) && map.get(newY)[newX]){
+                        if (!visited.contains(newPos) && map[newY][newX] != '#'){
                             // If it's an unfound destination
                             if (dests.indexOf(newPos) > i){
                                 // Declare the mininum distance bidirectionally

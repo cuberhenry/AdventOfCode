@@ -1,15 +1,11 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.Assembunny;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 23: Safe Cracking";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The program to be run
-        Assembunny program = new Assembunny(sc);
+        Assembunny program = new Assembunny(args);
         program.setRegister('a',7);
         // Get the value in register a
         program.run();

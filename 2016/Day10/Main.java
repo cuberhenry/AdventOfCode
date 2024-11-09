@@ -5,9 +5,8 @@ import java.util.LinkedList;
 
 public class Main {
     final private static String name = "Day 10: Balance Bots";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The list of all bots of the form
         // {val1, val2, low, high}

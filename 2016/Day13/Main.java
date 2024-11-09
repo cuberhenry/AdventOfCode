@@ -1,17 +1,13 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
-import java.util.Scanner;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Main {
     final private static String name = "Day 13: A Maze of Twisty Little Cubicles";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The input
-        int number = sc.nextInt();
+        int number = Library.getInt(args);
         // The breadth first search queue
         HashSet<ArrayState> history = new HashSet<>();
         LinkedList<int[]> queue = new LinkedList<>();

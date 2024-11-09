@@ -5,9 +5,8 @@ import java.util.Collections;
 
 public class Main {
     final private static String name = "Day 20: Firewall Rules";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The list of all ranges
         ArrayList<long[]> ranges = new ArrayList<>();

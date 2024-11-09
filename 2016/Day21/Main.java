@@ -4,9 +4,8 @@ import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 21: Scrambled Letters and Hash";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The code
         char[] scramble = {'a','b','c','d','e','f','g','h'};

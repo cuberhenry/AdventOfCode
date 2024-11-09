@@ -5,9 +5,8 @@ import java.util.PriorityQueue;
 
 public class Main {
     final private static String name = "Day 9: Explosives in Cyberspace";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // Take in the entire input
         String file = sc.nextLine();

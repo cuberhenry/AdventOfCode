@@ -3,9 +3,8 @@ import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 8: Two-Factor Authentication";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The screen of pixels
         boolean[][] screen = new boolean[6][50];

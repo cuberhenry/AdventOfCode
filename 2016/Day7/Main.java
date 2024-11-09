@@ -3,9 +3,8 @@ import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 7: Internet Protocol Version 7";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The number of IPs that fit the requirements
         int part1 = 0;

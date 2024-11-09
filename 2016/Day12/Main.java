@@ -1,15 +1,11 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.Assembunny;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 12: Leonardo's Monorail";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The program to be run
-        Assembunny program = new Assembunny(sc);
+        Assembunny program = new Assembunny(args);
         // Get the value in register a
         program.run();
         int part1 = program.getRegister('a');

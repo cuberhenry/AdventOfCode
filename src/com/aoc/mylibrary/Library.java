@@ -50,13 +50,26 @@ public class Library {
         return intSplit(getString(args),delim);
     }
 
+    public static char[] getCharArray(String[] args){
+        return getString(args).toCharArray();
+    }
+
+    public static boolean[] getBooleanArray(String[] args, char match){
+        char[] input = getCharArray(args);
+        boolean[] array = new boolean[input.length];
+        for (int i=0; i<input.length; ++i){
+            array[i] = input[i] == match;
+        }
+        return array;
+    }
+
     public static char[][] getCharMatrix(String[] args){
         Scanner sc = getScanner(args);
         ArrayList<String> input = new ArrayList<>();
         while (sc.hasNext()){
             input.add(sc.nextLine());
         }
-        char[][] grid = new char[input.size()][input.getFirst().length()];
+        char[][] grid = new char[input.size()][];
         for (int i=0; i<input.size(); ++i){
             grid[i] = input.get(i).toCharArray();
         }
@@ -217,6 +230,26 @@ public class Library {
             }
         }
         return -1;
+    }
+
+    public static int count(char[] array, char match){
+        int count = 0;
+        for (char c : array){
+            if (c == match){
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    public static int count(boolean[] array){
+        int count = 0;
+        for (boolean b : array){
+            if (b){
+                ++count;
+            }
+        }
+        return count;
     }
 
     public static int maxIndex(int[] array){

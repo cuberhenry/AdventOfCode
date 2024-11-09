@@ -1,16 +1,12 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
-import java.util.Scanner;
 import java.util.HashSet;
 
 public class Main {
     final private static String name = "Day 1: No Time for a Taxicab";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-        
         // The list of instructions
-        String[] input = sc.nextLine().split(", ");
+        String[] input = Library.getStringArray(args,", ");
         // Current position
         int[] position = new int[2];
         // Current direction

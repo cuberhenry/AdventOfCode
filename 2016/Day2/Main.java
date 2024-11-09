@@ -1,18 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 2: Bathroom Security";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // Take in the instructions
-        ArrayList<String> instructions = new ArrayList<>();
-        while (sc.hasNext()){
-            instructions.add(sc.nextLine());
-        }
+        String[] instructions = Library.getStringArray(args,"\n");
 
         // Default keypad
         char[][] keypad = new char[][] {{'1','2','3'},
@@ -31,7 +23,7 @@ public class Main {
         Library.print(part1,part2,name);
     }
 
-    private static String code(ArrayList<String> instructions, char[][] keypad, int x, int y){
+    private static String code(String[] instructions, char[][] keypad, int x, int y){
         // The resulting password
         String password = "";
         // Loop through every instruction

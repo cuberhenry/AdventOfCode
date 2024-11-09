@@ -1,30 +1,14 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 18: Like a Rogue";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
-        // Take in the first row of tiles
-        String input = sc.nextLine();
         // Whether each tile in the current row is a trap
-        boolean[] row = new boolean[input.length()];
+        boolean[] row = Library.getBooleanArray(args,'^');
 
         // The number of safe tiles
         int part1 = 0;
-        int part2 = 0;
-
-        // Loop through every tile in the first row
-        for (int i=0; i<row.length; ++i){
-            // Record if it's a trap
-            row[i] = input.charAt(i) == '^';
-            // Add to numSafe if it's safe
-            if (!row[i]){
-                ++part2;
-            }
-        }
+        int part2 = row.length - Library.count(row);
 
         // Loop through every consecutive row
         for (int i=1; i<400000; ++i){

@@ -1,14 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 5: How About a Nice Game of Chess?";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // Take in the input
-        String input = sc.next();
+        String input = Library.getString(args);
         // The index at which to start
         int index = 0;
         // The password
