@@ -4,9 +4,8 @@ import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 21: RPG Simulator 20XX";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // Take in all input, skipping unneeded information
         sc.next();

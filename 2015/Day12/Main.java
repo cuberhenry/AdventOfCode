@@ -4,9 +4,8 @@ import java.util.Stack;
 
 public class Main {
     final private static String name = "Day 12: JSAbacusFramework.io";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The sum of all numbers
         int part1 = 0;

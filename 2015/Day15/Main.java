@@ -4,9 +4,8 @@ import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 15: Science for Hungry People";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
         
         // The list of all ingredients
         ArrayList<int[]> ingredients = new ArrayList<>();

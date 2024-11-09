@@ -4,9 +4,8 @@ import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 5: Doesn't He Have Intern-Elves For This?";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // Constants for finding matches
         String vowels = "aeiou";

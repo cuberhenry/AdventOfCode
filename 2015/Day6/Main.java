@@ -3,9 +3,8 @@ import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 6: Probably a Fire Hazard";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The grid of lights
         boolean[][] digital = new boolean[1000][1000];

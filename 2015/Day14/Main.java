@@ -5,9 +5,8 @@ import java.util.HashSet;
 
 public class Main {
     final private static String name = "Day 14: Reindeer Olympics";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
         
         // An array list of reindeer with an int array of:
         // [speed, burstTime, cycleTime, distance, score]

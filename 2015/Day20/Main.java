@@ -1,14 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 20: Infinite Elves and Infinite Houses";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The number to find
-        int number = sc.nextInt();
+        int number = Library.getInt(args);
 
         // The answer to the problem
         int part1 = solve(number,10,number/10);

@@ -1,36 +1,27 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 23: Opening the Turing Lock";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // All of the instructions
-        ArrayList<String[]> instructions = new ArrayList<>();
-        // Take in all of the instructions
-        while (sc.hasNext()){
-            instructions.add(sc.nextLine().split(", | "));
-        }
+        String[][] assembly = Library.getAssembly(args);
         
         // Run the program
-        long part1 = compute(instructions,0);
-        long part2 = compute(instructions,1);
+        long part1 = compute(assembly,0);
+        long part2 = compute(assembly,1);
 
         // Print the answer
         Library.print(part1,part2,name);
     }
 
-    private static long compute(ArrayList<String[]> instructions, long input){
+    private static long compute(String[][] instructions, long input){
         // The starting register values
         long[] registers = {input,0};
 
         // Loop until an instruction that isn't specified is looked for
-        for (int index = 0; index >= 0 && index < instructions.size(); ++index){
+        for (int index = 0; index >= 0 && index < instructions.length; ++index){
             // Grab the instruction
-            String[] instruction = instructions.get(index);
+            String[] instruction = instructions[index];
             // Switch based on the instruction
             switch (instruction[0]){
                 // Half the value of the specified register

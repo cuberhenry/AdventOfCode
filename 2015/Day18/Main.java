@@ -4,9 +4,8 @@ import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 18: Like a GIF For Your Yard";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The list of on lights
         GameOfLife part1 = new GameOfLife(2);

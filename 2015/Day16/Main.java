@@ -4,9 +4,8 @@ import java.util.HashMap;
 
 public class Main {
     final private static String name = "Day 16: Aunt Sue";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
         
         // Used to find the value of the desired Aunt Sue
         HashMap<String,Integer> hashmap = new HashMap<>();

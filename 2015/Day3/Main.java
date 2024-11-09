@@ -1,18 +1,14 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 import java.util.HashSet;
 
 public class Main {
     final private static String name = "Day 3: Perfectly Spherical Houses in a Vacuum";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
         // Take in the input
-        String input = sc.nextLine();
+        String input = Library.getString(args);
 
         // Print the answer
         Library.print(part1(input),part2(input),name);
-        
     }
 
     private static int part1(String input){

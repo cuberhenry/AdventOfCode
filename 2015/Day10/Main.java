@@ -1,18 +1,14 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.BiHashMap;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class Main {
     final private static String name = "Day 10: Elves Look, Elves Say";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // Take in the starting number
-        String line = sc.next();
+        String line = Library.getString(args);
 
         // Create a hashmap for finding the quantity of each element initially
         BiHashMap<String,String> sequences = new BiHashMap<>();

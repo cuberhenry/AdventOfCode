@@ -1,13 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 4: The Ideal Stocking Stuffer";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
         // Take in the input
-        String input = sc.next();
+        String input = Library.getString(args);
         // The answer to the problem
         int part1 = -1;
         int part2 = -1;
@@ -23,7 +20,6 @@ public class Main {
             // Check for six leading zeroes
             if (hash.length() < 27){
                 part2 = i;
-                break;
             }
         }
         

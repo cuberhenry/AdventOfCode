@@ -5,9 +5,8 @@ import java.util.HashMap;
 
 public class Main {
     final private static String name = "Day 7: Some Assembly Required";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
         // The current values of all wires
         HashMap<String,Integer> hashmap = new HashMap<>();
         // The list of wires still needing calculation

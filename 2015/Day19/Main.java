@@ -5,9 +5,8 @@ import java.util.HashSet;
 
 public class Main {
     final private static String name = "Day 19: Medicine for Rudolph";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The list of all replacements
         ArrayList<String[]> replacements = new ArrayList<>();

@@ -5,9 +5,8 @@ import java.util.Stack;
 
 public class Main {
     final private static String name = "Day 9: All in a Single Night";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // All lines of input
         ArrayList<String[]> input = new ArrayList<>();

@@ -5,9 +5,8 @@ import java.util.Stack;
 
 public class Main {
     final private static String name = "Day 22: Wizard Simulator 20XX";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // Get rid of excess information
         sc.next();

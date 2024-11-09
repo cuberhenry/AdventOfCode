@@ -1,29 +1,19 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 17: No Such Thing as Too Much";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // All of the containers
-        ArrayList<Integer> containers = new ArrayList<>();
+        int[] containers = Library.getIntArray(args,"\n");
         // The answer to the problem
         int part1 = 0;
         int part2 = 0;
-
-        // Add all containers to the list
-        while (sc.hasNext()){
-            containers.add(sc.nextInt());
-        }
 
         // The current minimum number of containers
         int min = Integer.MAX_VALUE;
 
         // Loop through a number for every possible combination
-        for (int i=0; i<(int)Math.pow(2,containers.size()); ++i){
+        for (int i=0; i<(int)Math.pow(2,containers.length); ++i){
             // The number of liters required filled with the given combination
             int liters = 0;
             // The number of containers used
@@ -33,7 +23,7 @@ public class Main {
             for (int j=0; num > 0; ++j){
                 if (num % 2 == 1){
                     ++numContainers;
-                    liters += containers.get(j);
+                    liters += containers[j];
                 }
                 num /= 2;
             }

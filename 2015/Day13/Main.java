@@ -5,9 +5,8 @@ import java.util.Stack;
 
 public class Main {
     final private static String name = "Day 13: Knights of the Dinner Table";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // All of the lines of input
         ArrayList<String[]> input = new ArrayList<>();

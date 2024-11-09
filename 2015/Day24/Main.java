@@ -1,24 +1,12 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
-import java.util.ArrayList;
 
 public class Main {
     final private static String name = "Day 24: It Hangs in the Balance";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The list of all packages
-        ArrayList<Integer> packages = new ArrayList<>();
+        int[] packages = Library.getIntArray(args,"\n");
         // The total weight of the packages
-        int weight = 0;
-        // Loop through every package in the input
-        while (sc.hasNext()){
-            // Add the weight to the total weight and the packages
-            int w = sc.nextInt();
-            packages.add(w);
-            weight += w;
-        }
+        int weight = Library.sum(packages);
 
         // The minimum quantum entanglement
         long part1 = Long.MAX_VALUE;
@@ -36,7 +24,7 @@ public class Main {
             long bestQE4 = Long.MAX_VALUE;
 
             // Continue until every combination of i packages has been examined
-            while (indices[0] <= packages.size() - i){
+            while (indices[0] <= packages.length - i){
                 // The total weight of the current packages
                 int total = 0;
                 // The quantum entanglement of this combination
@@ -44,8 +32,8 @@ public class Main {
                 // Loop through every package
                 for (int j=0; j<i; ++j){
                     // Calculate the values
-                    total += packages.get(indices[j]);
-                    qe *= packages.get(indices[j]);
+                    total += packages[indices[j]];
+                    qe *= packages[indices[j]];
                 }
 
                 // If it's a new best quantum entanglement
@@ -59,7 +47,7 @@ public class Main {
                 // Change the combination starting at the end
                 int j = i-1;
                 // If it's already reached the end, go back one index
-                while (j >= 0 && indices[j] == packages.size()-i+j){
+                while (j >= 0 && indices[j] == packages.length-i+j){
                     --j;
                 }
 

@@ -3,9 +3,8 @@ import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 8: Matchsticks";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The number of characters in the input
         int total = 0;

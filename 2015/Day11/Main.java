@@ -1,14 +1,10 @@
 import com.aoc.mylibrary.Library;
-import java.util.Scanner;
 
 public class Main {
     final private static String name = "Day 11: Corporate Policy";
-    private static Scanner sc;
     public static void main(String args[]) {
-        sc = Library.getScanner(args);
-
         // The current password we're examining
-        char[] password = sc.next().toCharArray();
+        char[] password = Library.getString(args).toCharArray();
 
         String part1 = nextPassword(password);
         String part2 = nextPassword(password);
