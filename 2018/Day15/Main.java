@@ -1,14 +1,14 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 15 https://adventofcode.com/2018/day/15
-Input: https://adventofcode.com/2018/day/15/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 public class Main {
+    final private static String name = "Day 15: Beverage Bandits";
+
     // A class representing a unit (goblin or elf)
     private static class Unit {
         // The starting coordinates
@@ -54,9 +54,9 @@ public class Main {
         }
 
         // Perform the move section of unit's turn
-        public void move(HashSet<String> grid, ArrayList<Unit> units){
+        public void move(HashSet<ArrayState> grid, ArrayList<Unit> units){
             // The list of enemies' locations
-            HashSet<String> targets = new HashSet<>();
+            HashSet<ArrayState> targets = new HashSet<>();
             // Loop through each living unit
             for (Unit unit : units){
                 // If it's a friendly, skip
@@ -64,55 +64,57 @@ public class Main {
                     continue;
                 }
                 // Add its location
-                targets.add(unit.getX() + " " + unit.getY());
+                targets.add(new ArrayState(new int[] {unit.getX(),unit.getY()}));
             }
 
             // The first step to be taken if the key is your destination
-            HashMap<String,String> firstStep = new HashMap<>();
+            HashMap<ArrayState,ArrayState> firstStep = new HashMap<>();
             // The list of locations to check
-            LinkedList<String> queue = new LinkedList<>();
+            LinkedList<ArrayState> queue = new LinkedList<>();
             // The nearest enemy to step towards
-            ArrayList<String> nearest = new ArrayList<>();
+            ArrayList<ArrayState> nearest = new ArrayList<>();
             // Add the initial locations
-            queue.add(x + " " + y);
-            firstStep.put(x + " " + y,"0 0");
+            ArrayState initialState = new ArrayState(new int[] {x,y});
+            ArrayState zeroState = new ArrayState(new int[] {0,0});
+            queue.add(initialState);
+            firstStep.put(initialState,zeroState);
 
             // Continue until enemies are found or no enemies can be found
             while (!queue.isEmpty() && nearest.isEmpty()){
                 // Copy a new queue
-                LinkedList<String> newQueue = new LinkedList<>();
+                LinkedList<ArrayState> newQueue = new LinkedList<>();
                 // Continue until this step has been finished
                 while (!queue.isEmpty()){
                     // Get the coordinates
-                    String[] split = queue.remove().split(" ");
-                    int x = Integer.parseInt(split[0]);
-                    int y = Integer.parseInt(split[1]);
+                    ArrayState currState = queue.remove();
+                    int[] pos = currState.getArray();
                     // Look in each direction
                     for (int i=0; i<4; ++i){
-                        int newX = x;
-                        int newY = y;
+                        int newX = pos[0];
+                        int newY = pos[1];
                         switch (i){
                             case 0 -> {--newY;}
                             case 1 -> {--newX;}
                             case 2 -> {++newX;}
                             case 3 -> {++newY;}
                         }
+                        ArrayState newState = new ArrayState(new int[] {newX,newY});
                         // If it's an enemy, add it as an option
-                        if (targets.contains(newX + " " + newY)){
-                            nearest.add(x + " " + y);
+                        if (targets.contains(newState)){
+                            nearest.add(currState);
                         // Otherwise, if it's a wall, friendly, or already been searched, skip
-                        }else if (grid.contains(newX + " " + newY) || getFromPos(newX,newY,units) != null
-                            || firstStep.containsKey(newX + " " + newY)){
+                        }else if (grid.contains(newState) || getFromPos(newX,newY,units) != null
+                            || firstStep.containsKey(newState)){
                             continue;
                         }
                         // Add the best first step
-                        if (firstStep.get(x + " " + y).equals("0 0")){
-                            firstStep.put(newX + " " + newY,(newX-x) + " " + (newY-y));
+                        if (firstStep.get(currState).equals(zeroState)){
+                            firstStep.put(newState,new ArrayState(new int[] {newX-pos[0],newY-pos[1]}));
                         }else{
-                            firstStep.put(newX + " " + newY,firstStep.get(x + " " + y));
+                            firstStep.put(newState,firstStep.get(currState));
                         }
                         // Add the new location to the queue
-                        newQueue.add(newX + " " + newY);
+                        newQueue.add(newState);
                     }
                 }
                 queue = newQueue;
@@ -123,24 +125,17 @@ public class Main {
                 return;
             }
             // Get the first in reading order
-            String min = nearest.get(0);
+            ArrayState min = nearest.getFirst();
             for (int i=1; i<nearest.size(); ++i){
                 min = Unit.readingOrder(min,nearest.get(i));
             }
 
             // Get the first step for that destination
-            min = firstStep.get(min);
+            int[] change = firstStep.get(min).getArray();
 
             // Move in that direction
-            if (min.equals("0 -1")){
-                --y;
-            }else if (min.equals("-1 0")){
-                --x;
-            }else if (min.equals("1 0")){
-                ++x;
-            }else if (min.equals("0 1")){
-                ++y;
-            }
+            x += change[0];
+            y += change[1];
         }
 
         // Perform the attack section of unit's turn
@@ -192,18 +187,16 @@ public class Main {
         }
 
         // Returns the coordinates that are first in reading order
-        public static String readingOrder(String left, String right){
-            String[] lSplit = left.split(" ");
-            String[] rSplit = right.split(" ");
-            int lY = Integer.parseInt(lSplit[1]);
-            int rY = Integer.parseInt(rSplit[1]);
+        public static ArrayState readingOrder(ArrayState left, ArrayState right){
+            int lY = left.getArray()[1];
+            int rY = right.getArray()[1];
             if (lY < rY){
                 return left;
             }
             if (lY > rY){
                 return right;
             }
-            return Integer.parseInt(lSplit[0]) < Integer.parseInt(rSplit[0]) ? left : right;
+            return left.getArray()[0] < right.getArray()[0] ? left : right;
         }
 
         // Gets a unit from an x and y
@@ -230,35 +223,12 @@ public class Main {
             return hasElf && hasGoblin;
         }
     }
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // Take in the map
-        HashSet<String> grid = new HashSet<>();
+        HashSet<ArrayState> grid = new HashSet<>();
         // All units
         ArrayList<Unit> units = new ArrayList<>();
         int height = 0;
@@ -273,46 +243,44 @@ public class Main {
                     units.add(new Unit(i,height,line.charAt(i) == 'E'));
                 }else if (line.charAt(i) == '#'){
                     // Add the wall
-                    grid.add(i + " " + height);
+                    grid.add(new ArrayState(new int[] {i,height}));
                 }
             }
             ++height;
         }
 
-        // Part 1 finds the combat outcome given the start
-        if (PART == 1){
-            System.out.println(simulate(grid,units));
-        }
+        // The answer to the problem
+        int part1 = simulate(grid,new ArrayList<>(units),false);
+        int part2 = 0;
 
-        // Part 2 finds the outcome from giving the elves the minimum attack
-        // boost they need to not let any of them die
-        if (PART == 2){
-            // Loop through each attack between 3 and every unit's health
-            for (int i=4; i<=200; ++i){
-                // Get a temporary array containing the currently alive units
-                ArrayList<Unit> thisUnits = new ArrayList<>(units);
-                // Reset all units
-                for (Unit unit : units){
-                    // Give elves an attack boost
-                    if (unit.isElf()){
-                        unit.reset(i);
-                    }else{
-                        unit.reset();
-                    }
-                }
-                // Simulate the combat
-                int answer = simulate(grid,thisUnits);
-                // If the elves won, print the answer
-                if (answer > 0){
-                    System.out.println(answer);
-                    break;
+        // Loop through each attack between 3 and every unit's health
+        for (int i=4; i<=200; ++i){
+            // Get a temporary array containing the currently alive units
+            ArrayList<Unit> thisUnits = new ArrayList<>(units);
+            // Reset all units
+            for (Unit unit : units){
+                // Give elves an attack boost
+                if (unit.isElf()){
+                    unit.reset(i);
+                }else{
+                    unit.reset();
                 }
             }
+            // Simulate the combat
+            int answer = simulate(grid,thisUnits,true);
+            // If the elves won, print the answer
+            if (answer > 0){
+                part2 = answer;
+                break;
+            }
         }
+
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 
     // Simulates combat
-    private static int simulate(HashSet<String> grid, ArrayList<Unit> units){
+    private static int simulate(HashSet<ArrayState> grid, ArrayList<Unit> units, boolean noDeaths){
         // Continue until the battle finishes
         for (int rounds=0; true; ++rounds){
             // Sort the units in reading order
@@ -350,7 +318,7 @@ public class Main {
                 // If the target died
                 if (target != null){
                     // Part 2 requires that no elf dies
-                    if (PART == 2){
+                    if (noDeaths){
                         // If an elf died
                         if (target.isElf()){
                             // Return failure

@@ -1,73 +1,39 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 13 https://adventofcode.com/2018/day/13
-Input: https://adventofcode.com/2018/day/13/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 13: Mine Cart Madness";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
         // The tracks
-        ArrayList<String> grid = new ArrayList<>();
+        char[][] grid = Library.getCharMatrix(args);
         // The carts
         ArrayList<int[]> carts = new ArrayList<>();
 
         // Take in the map of inputs
-        while (sc.hasNext()){
-            // Take in the next line
-            String line = sc.nextLine();
-
+        for (int i=0; i<grid.length; ++i){
             // Loop through every character
-            for (int i=0; i<line.length(); ++i){
+            for (int j=0; j<grid[0].length; ++j){
                 // When a cart is found, add it to carts
                 // Replace it with the track that's under it
-                if (line.charAt(i) == '<'){
-                    carts.add(new int[] {i,grid.size(),3,0});
-                    line = line.substring(0,i) + '-' + line.substring(i+1);
-                } else if (line.charAt(i) == '>'){
-                    carts.add(new int[] {i,grid.size(),1,0});
-                    line = line.substring(0,i) + '-' + line.substring(i+1);
-                } else if (line.charAt(i) == 'v'){
-                    carts.add(new int[] {i,grid.size(),2,0});
-                    line = line.substring(0,i) + '|' + line.substring(i+1);
-                } else if (line.charAt(i) == '^'){
-                    carts.add(new int[] {i,grid.size(),0,0});
-                    line = line.substring(0,i) + '|' + line.substring(i+1);
+                if (grid[i][j] == '<'){
+                    carts.add(new int[] {j,i,3,0});
+                    grid[i][j] = '-';
+                } else if (grid[i][j] == '>'){
+                    carts.add(new int[] {j,i,1,0});
+                    grid[i][j] = '-';
+                } else if (grid[i][j] == 'v'){
+                    carts.add(new int[] {j,i,2,0});
+                    grid[i][j] = '|';
+                } else if (grid[i][j] == '^'){
+                    carts.add(new int[] {j,i,0,0});
+                    grid[i][j] = '|';
                 }
             }
-
-            // Add the line to the grid
-            grid.add(line);
         }
+
+        // The first collision
+        String part1 = "";
 
         // Continue until there's only one cart
         while (carts.size() > 1){
@@ -90,9 +56,8 @@ public class Main {
                     // If the carts have the same position and they're not the same
                     if (cart[0] == other[0] && cart[1] == other[1] && i != j){
                         // Part 1 finds the location of the first crash
-                        if (PART == 1){
-                            System.out.println(cart[0] + "," + cart[1]);
-                            return;
+                        if (part1.isBlank()){
+                            part1 = cart[0] + "," + cart[1];
                         }
 
                         // Indicate which cart has been crashed into
@@ -115,7 +80,7 @@ public class Main {
                 }
 
                 // Determine next direction
-                switch(grid.get(cart[1]).charAt(cart[0])){
+                switch(grid[cart[1]][cart[0]]){
                     // Determine next direction based on intersection decider
                     case '+' -> {
                         if (cart[3] == 0){
@@ -143,7 +108,10 @@ public class Main {
             });
         }
 
-        // Part 2 finds the location of the last cart when all others have crashed
-        System.out.println(carts.get(0)[0] + "," + carts.get(0)[1]);
+        // The last cart after the collision
+        String part2 = carts.getFirst()[0] + "," + carts.getFirst()[1];
+        
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

@@ -56,7 +56,7 @@ public class Main {
                 }
             }
             // If all starting pieces have been examined, quit
-            if (bridge.size() == 0){
+            if (bridge.isEmpty()){
                 break;
             }
 

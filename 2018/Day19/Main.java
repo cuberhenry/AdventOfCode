@@ -1,41 +1,12 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 19 https://adventofcode.com/2018/day/19
-Input: https://adventofcode.com/2018/day/19/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 19: Go With The Flow";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The program to be executed
         ArrayList<String[]> program = new ArrayList<>();
         // The instruction pointer
@@ -45,12 +16,18 @@ public class Main {
             program.add(sc.nextLine().split(" "));
         }
 
+        // The answer to the problem
+        long part1 = run(program,ip,false);
+        long part2 = run(program,ip,true);
+
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static long run(ArrayList<String[]> program, int ip, boolean part2){
         // The registers during the program
         long[] regs = new long[6];
-
-        // Part 1 finds the value of register 0
-        // Part 2 starts register 0 at 1
-        if (PART == 2){
+        if (part2){
             regs[0] = 1;
         }
 
@@ -63,13 +40,11 @@ public class Main {
                 opp[i] = Integer.parseInt(split[i]);
             }
 
-            // Part 2 is very inefficient, but it finds the sum of
-            // all factors of register 5
-            if (PART == 2){
-                // The index of the register that bounds the search
-                int bound = Integer.parseInt(program.get(4)[2]);
+            if (part2){
                 // If the registers have been initialized
                 if (regs[ip] == 1){
+                    // The index of the register that bounds the search
+                    int bound = Integer.parseInt(program.get(4)[2]);
                     // Loop through every possible factor of the bound register
                     for (int i=1; i<= regs[bound]; ++i){
                         if (regs[bound] % i == 0){
@@ -78,7 +53,7 @@ public class Main {
                     }
     
                     // That's all the code does, so break out
-                    break;
+                    return regs[0];
                 }
             }
 
@@ -124,7 +99,6 @@ public class Main {
             ++regs[ip];
         }
 
-        // Print the answer
-        System.out.println(regs[0]);
+        return regs[0];
     }
 }

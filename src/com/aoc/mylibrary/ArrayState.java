@@ -43,6 +43,18 @@ public class ArrayState implements Comparable<ArrayState> {
         return Arrays.hashCode(array);
     }
 
+    public int distance(ArrayState other){
+        return distance(other.getArray());
+    }
+
+    public int distance(int[] other){
+        int distance = 0;
+        for (int i=0; i<array.length; ++i){
+            distance += Math.abs(array[i]-other[i]);
+        }
+        return distance;
+    }
+
     public String toString(){
         return Arrays.toString(array);
     }

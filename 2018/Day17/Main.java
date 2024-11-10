@@ -1,43 +1,15 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 17 https://adventofcode.com/2018/day/17
-Input: https://adventofcode.com/2018/day/17/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.HashSet;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 17: Reservoir Research";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The coordinates of every clay
-        HashSet<String> clay = new HashSet<>();
+        HashSet<ArrayState> clay = new HashSet<>();
         // The min and max clay coordinate
         int minY = Integer.MAX_VALUE;
         int maxY = 0;
@@ -65,42 +37,36 @@ public class Main {
             for (int i=start; i<=end; ++i){
                 // Add the clay
                 if (split[0].equals("y")){
-                    clay.add(i + " " + first);
+                    clay.add(new ArrayState(new int[] {i,first}));
                 }else{
-                    clay.add(first + " " + i);
+                    clay.add(new ArrayState(new int[] {first,i}));
                 }
             }
         }
 
         // Every spot with water
-        HashSet<String> water = new HashSet<>();
+        HashSet<ArrayState> water = new HashSet<>();
         // Perform the simulation starting at the spring
         dropWater(500,minY,maxY,clay,water);
 
-        // Part 1 finds the amount of tiles that water passes through
-        if (PART == 1){
-            // Print the answer
-            System.out.println(water.size());
-        }
+        // The answer to the problem
+        int part1 = water.size();
+        water.retainAll(clay);
+        int part2 = water.size();
 
-        // Part 2 finds the amount of tiles that water settles in
-        if (PART == 2){
-            // Get rid of all water that wasn't halted
-            water.retainAll(clay);
-            // Print the answer
-            System.out.println(water.size());
-        }
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 
     // Simulates dropping water at a specific coordinate
     // Returns whether all of the water dropped has settled
-    public static boolean dropWater(int x, int y, int maxY, HashSet<String> clay, HashSet<String> water){
+    public static boolean dropWater(int x, int y, int maxY, HashSet<ArrayState> clay, HashSet<ArrayState> water){
         // The starting value of y
         int startY = y;
         // Continue until clay is hit
-        while (!clay.contains(x + " " + (y+1))){
+        while (!clay.contains(new ArrayState(new int[] {x,y+1}))){
             // Add water
-            water.add(x + " " + y);
+            water.add(new ArrayState(new int[] {x,y}));
             // Move down
             ++y;
             // Any water dropping out of the scan is irrelevant
@@ -110,10 +76,10 @@ public class Main {
         }
 
         // Water has already been simulated here
-        if (water.contains(x + " " + y)){
+        if (water.contains(new ArrayState(new int[] {x,y}))){
             return false;
         }
-        water.add(x + " " + y);
+        water.add(new ArrayState(new int[] {x,y}));
 
         // Loop until a break point is reached
         while (true){
@@ -122,32 +88,32 @@ public class Main {
             int right = x+1;
 
             // Keep moving until hitting clay or a hole to drop from
-            while (!clay.contains(left + " " + y) && clay.contains(left + " " + (y+1))){
-                water.add(left + " " + y);
+            while (!clay.contains(new ArrayState(new int[] {left,y})) && clay.contains(new ArrayState(new int[] {left,y+1}))){
+                water.add(new ArrayState(new int[] {left,y}));
                 --left;
             }
 
             // Keep moving until hitting water or a hole to drop from
-            while (!clay.contains(right + " " + y) && clay.contains(right + " " + (y+1))){
-                water.add(right + " " + y);
+            while (!clay.contains(new ArrayState(new int[] {right,y})) && clay.contains(new ArrayState(new int[] {right,y+1}))){
+                water.add(new ArrayState(new int[] {right,y}));
                 ++right;
             }
 
             // If its blocked in by clay
-            if (clay.contains(left + " " + y) && clay.contains(right + " " + y)){
+            if (clay.contains(new ArrayState(new int[] {left,y})) && clay.contains(new ArrayState(new int[] {right,y}))){
                 // Turn all water into standing water (consider to be clay)
                 for (int i=left+1; i<right; ++i){
-                    clay.add(i + " " + y);
+                    clay.add(new ArrayState(new int[] {i,y}));
                 }
             }else{
                 // Whether either side has been filled
                 boolean filled = false;
                 // If the left side should be dropped from, drop from there
-                if (!clay.contains(left + " " + y) && !clay.contains(left + " " + (y+1)) && !water.contains(left + " " + y)){
+                if (!clay.contains(new ArrayState(new int[] {left,y})) && !clay.contains(new ArrayState(new int[] {left,y+1})) && !water.contains(new ArrayState(new int[] {left,y}))){
                     filled = dropWater(left,y,maxY,clay,water);
                 }
                 // If the right side should be dropped from, drop from there
-                if (!clay.contains(right + " " + y) && !clay.contains(right + " " + (y+1)) && !water.contains(right + " " + y)){
+                if (!clay.contains(new ArrayState(new int[] {right,y})) && !clay.contains(new ArrayState(new int[] {right,y+1})) && !water.contains(new ArrayState(new int[] {right,y}))){
                     filled = filled || dropWater(right,y,maxY,clay,water);
                 }
                 // If they both dropped fully, no need to return here

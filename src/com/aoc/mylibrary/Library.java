@@ -206,7 +206,7 @@ public class Library {
         int[] intSplit = new int[split.length];
 
         for (int i=0; i<split.length; ++i){
-            intSplit[i] = Integer.parseInt(split[i]);
+            intSplit[i] = Integer.parseInt(split[i].trim());
         }
 
         return intSplit;
@@ -217,7 +217,7 @@ public class Library {
         long[] longSplit = new long[split.length];
 
         for (int i=0; i<split.length; ++i){
-            longSplit[i] = Long.parseLong(split[i]);
+            longSplit[i] = Long.parseLong(split[i].trim());
         }
 
         return longSplit;
@@ -364,25 +364,64 @@ public class Library {
     }
 
     public static String read(boolean[][] display){
-        HashMap<Integer,Character> letters = new HashMap<>();
-        letters.put(422068812,'C');
-        letters.put(1024344606,'E');
-        letters.put(623856210,'H');
-        letters.put(474091662,'I');
-        letters.put(203491916,'J');
-        letters.put(625758866,'K');
-        letters.put(554189342,'L');
-        letters.put(422136396,'O');
-        letters.put(959017488,'P');
-        letters.put(959017618,'R');
-        letters.put(623462988,'U');
-        letters.put(588583044,'Y');
-        letters.put(1008869918,'Z');
+        if (display.length == 6){
+            HashMap<Integer,Character> letters = new HashMap<>();
+            letters.put(422068812,'C');
+            letters.put(1024344606,'E');
+            letters.put(623856210,'H');
+            letters.put(474091662,'I');
+            letters.put(203491916,'J');
+            letters.put(625758866,'K');
+            letters.put(554189342,'L');
+            letters.put(422136396,'O');
+            letters.put(959017488,'P');
+            letters.put(959017618,'R');
+            letters.put(623462988,'U');
+            letters.put(588583044,'Y');
+            letters.put(1008869918,'Z');
+            String text = "";
+            for (int i=0; i<display[0].length; i += 5){
+                int hash = 0;
+                for (int j=0; j<6; ++j){
+                    for (int k=0; k<5; ++k){
+                        hash <<= 1;
+                        if (display[j][i+k]){
+                            ++hash;
+                        }
+                    }
+                }
+                if (letters.containsKey(hash)){
+                    text += letters.get(hash);
+                }else{
+                    text = "ERROR: New Letter (" + hash + ")\n";
+                    for (boolean[] row : display){
+                        for (int j=i; j<i+5; ++j){
+                            text += row[j] ? '#' : '.';
+                        }
+                        text += '\n';
+                    }
+                    break;
+                }
+            }
+            return text;
+        }
+        HashMap<Long,Character> letters = new HashMap<>();
+        letters.put(1126328852231362686L,'B');
+        letters.put(549863600932653150L,'C');
+        letters.put(1144057308981102624L,'F');
+        letters.put(549863601050360029L,'G');
+        letters.put(603911296530126945L,'H');
+        letters.put(126672675233474716L,'J');
+        letters.put(585610922974906431L,'L');
+        letters.put(608485791103334625L,'N');
+        letters.put(1126328852214319136L,'P');
+        letters.put(1126328852281960545L,'R');
+        letters.put(1135193120993052735L,'Z');
         String text = "";
-        for (int i=0; i<display[0].length; i += 5){
-            int hash = 0;
-            for (int j=0; j<6; ++j){
-                for (int k=0; k<5; ++k){
+        for (int i=0; i<display[0].length; i += 8){
+            long hash = 0;
+            for (int j=0; j<10; ++j){
+                for (int k=0; k<6; ++k){
                     hash <<= 1;
                     if (display[j][i+k]){
                         ++hash;
@@ -394,7 +433,7 @@ public class Library {
             }else{
                 text = "ERROR: New Letter (" + hash + ")\n";
                 for (boolean[] row : display){
-                    for (int j=i; j<i+5; ++j){
+                    for (int j=i; j<i+6; ++j){
                         text += row[j] ? '#' : '.';
                     }
                     text += '\n';

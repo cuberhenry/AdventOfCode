@@ -1,14 +1,12 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 24 https://adventofcode.com/2018/day/24
-Input: https://adventofcode.com/2018/day/24/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+
 public class Main {
+    final private static String name = "Day 24: Immune System Simulator 20XX";
+
     // A class representing a group of units
     private static class Group {
         // The number of units in the group
@@ -24,8 +22,8 @@ public class Main {
         // An ordering tool for turns
         private final int initiative;
         // Damage types that this group is weak or immune to
-        private ArrayList<String> weaknesses = new ArrayList<>();
-        private ArrayList<String> immunities = new ArrayList<>();
+        private HashSet<String> weaknesses = new HashSet<>();
+        private HashSet<String> immunities = new HashSet<>();
         // The amount of damage dealt in a normal attack
         private int effectivePower;
 
@@ -44,7 +42,7 @@ public class Main {
             int pointer = 7;
             // Get the immunities and/or weaknesses if they exist
             while (split[pointer].equals("immune") || split[pointer].equals("weak")){
-                ArrayList<String> list = new ArrayList<>();
+                HashSet<String> list = new HashSet<>();
                 int index = pointer + 2;
                 // Break point for where the damage types end
                 while (!"immune weak with".contains(split[index])){
@@ -205,33 +203,9 @@ public class Main {
         }
     }
 
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // All of the active immune system groups
         ArrayList<Group> immuneSystem = new ArrayList<>();
         // All of the active infection groups
@@ -264,6 +238,10 @@ public class Main {
         ArrayList<Group> immuneCopy = new ArrayList<>(immuneSystem);
         ArrayList<Group> infectionCopy = new ArrayList<>(infection);
         ArrayList<Group> allCopy = new ArrayList<>(allGroups);
+
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
 
         // Continue until one group has won
         while (!immuneSystem.isEmpty() && !infection.isEmpty()){
@@ -314,33 +292,35 @@ public class Main {
                 immuneSystem.clear();
             }
 
-            // Part 1 finds the number of remaining units after the battle
-            // Part 2 finds the same after giving the immune system a minimum boost to win
-            if (PART == 2){
-                // If the immune system lost
-                if (immuneSystem.isEmpty()){
-                    // Resurrect destroyed groups
-                    immuneSystem = new ArrayList<>(immuneCopy);
-                    infection = new ArrayList<>(infectionCopy);
-                    allGroups = new ArrayList<>(allCopy);
-                    // Boost all immune system attacks by 1
-                    for (Group group : immuneSystem){
-                        group.boost();
-                    }
-                    // Reset each group
+            // If the immune system lost
+            if (immuneSystem.isEmpty()){
+                if (part1 == 0){
                     for (Group group : allGroups){
-                        group.reset();
+                        part1 += group.getUnits();
                     }
+                }
+
+                // Resurrect destroyed groups
+                immuneSystem = new ArrayList<>(immuneCopy);
+                infection = new ArrayList<>(infectionCopy);
+                allGroups = new ArrayList<>(allCopy);
+                // Boost all immune system attacks by 1
+                for (Group group : immuneSystem){
+                    group.boost();
+                }
+                // Reset each group
+                for (Group group : allGroups){
+                    group.reset();
                 }
             }
         }
 
         // Count all the units
-        int numUnits = 0;
         for (Group group : allGroups){
-            numUnits += group.getUnits();
+            part2 += group.getUnits();
         }
+
         // Print the answer
-        System.out.println(numUnits);
+        Library.print(part1,part2,name);
     }
 }

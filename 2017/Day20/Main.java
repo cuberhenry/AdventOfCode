@@ -36,7 +36,7 @@ public class Main {
         }
 
         // Continue until all particles have either collided or permanently escaped collision
-        while (particles.size() > 0){
+        while (!particles.isEmpty()){
             // Loop through every particle
             for (int i=0; i<particles.size(); ++i){
                 // Get the current particle

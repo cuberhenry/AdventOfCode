@@ -1,41 +1,12 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 12 https://adventofcode.com/2018/day/12
-Input: https://adventofcode.com/2018/day/12/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 12: Subterranean Sustainability";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // Take in the initial state
         String plants = sc.nextLine().split(" ")[2];
         sc.nextLine();
@@ -49,18 +20,22 @@ public class Main {
             String[] line = sc.nextLine().split(" ");
             rules.put(line[0],line[2]);
         }
-
-        // The number of generations to track
-        long generations = 20;
-
-        // Part 1 finds the plants after 20 generations
-        // Part 2 finds the plants after 50 billion generations
-        if (PART == 2){
-            generations = 50000000000L;
-        }
+        
+        // The answer to the problem
+        long part1 = 0;
+        long part2 = 0;
 
         // Repeat for every generation
-        for (long i=0; i<generations; ++i){
+        for (long i=0; i<50000000000L; ++i){
+            if (i == 20){
+                for (int j=0; j<plants.length(); ++j){
+                    if (plants.charAt(j) == '#'){
+                        // Add the plant's index
+                        part1 += j + left;
+                    }
+                }
+            }
+
             // Add buffers
             plants = "...." + plants + "....";
             // The next generation
@@ -89,7 +64,7 @@ public class Main {
             // If it repeats
             if (plants.equals("...."+newPlants+"....")){
                 // Add the difference until you get to the desired generation
-                left = generations-(i+1) + newLeft;
+                left = 50000000000L-(i+1) + newLeft;
                 plants = newPlants;
                 break;
             }
@@ -100,15 +75,14 @@ public class Main {
         }
 
         // The sum of the indexes of the plants
-        long total = 0;
         for (int i=0; i<plants.length(); ++i){
             if (plants.charAt(i) == '#'){
                 // Add the plant's index
-                total += i + left;
+                part2 += i + left;
             }
         }
 
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 }

@@ -28,7 +28,7 @@ public class Main {
                     ++part1;
                     // The current position
                     ArrayState pos = new ArrayState(new int[] {j,i});
-                    regions.union(pos,pos);
+                    regions.add(pos);
                     
                     // Check left and up for connected sets
                     ArrayState left = new ArrayState(new int[] {j-1,i});

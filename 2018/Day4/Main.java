@@ -1,43 +1,17 @@
-/*
-Henry Anderson
-Advent of Code 2018 Day 4 https://adventofcode.com/2018/day/4
-Input: https://adventofcode.com/2018/day/4/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 4: Repose Record";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // All events in chronological order
         ArrayList<int[]> timeline = new ArrayList<>();
+
         // Take in every line
         while (sc.hasNextLine()){
             String line = sc.nextLine();
@@ -56,20 +30,13 @@ public class Main {
                 guard = Integer.parseInt(line.substring(26,line.indexOf(" begins")));
             }
 
-            // Add the item into the timeline chronologically
-            int[] item = {time,guard};
-            boolean inserted = false;
-            for (int i=0; i<timeline.size(); ++i){
-                if (item[0] < timeline.get(i)[0]){
-                    timeline.add(i,item);
-                    inserted = true;
-                    break;
-                }
-            }
-            if (!inserted){
-                timeline.add(item);
-            }
+            timeline.add(new int[] {time,guard});
         }
+
+        // Sort the timeline
+        Collections.sort(timeline,(a,b) -> {
+            return Integer.compare(a[0],b[0]);
+        });
 
         // The guards' schedules
         HashMap<Integer,int[]> schedule = new HashMap<>();
@@ -105,62 +72,55 @@ public class Main {
             }
         }
 
-        // Part 1 finds the minute that the guard who was asleep
-        // the longest was asleep during the most
-        if (PART == 1){
-            // The number of minutes the guard was asleep
-            int max = 0;
-            // The guard that was asleep the longest
-            guard = 0;
-            // Loop through every guard
-            for (int i : schedule.keySet()){
-                // Get the total number of minutes asleep
-                int total = 0;
-                for (int j=0; j<60; ++j){
-                    total += schedule.get(i)[j];
-                }
-                // If the guard was asleep the longest, record him
-                if (total > max){
-                    guard = i;
-                    max = total;
-                }
+        // The number of minutes the guard was asleep
+        int max = 0;
+        // The guard that was asleep the longest
+        guard = 0;
+        // Loop through every guard
+        for (int i : schedule.keySet()){
+            // Get the total number of minutes asleep
+            int total = 0;
+            for (int j=0; j<60; ++j){
+                total += schedule.get(i)[j];
             }
+            // If the guard was asleep the longest, record him
+            if (total > max){
+                guard = i;
+                max = total;
+            }
+        }
 
-            // The number of times the guard was asleep during the minute
-            max = 0;
-            int minute = 0;
+        // The number of times the guard was asleep during the minute
+        max = 0;
+        int minute = 0;
+        // Loop through every minute
+        for (int i=0; i<60; ++i){
+            // If the guard was asleep more, record it
+            if (schedule.get(guard)[i] > max){
+                max = schedule.get(guard)[i];
+                minute = i;
+            }
+        }
+
+        // Get the answer
+        int part1 = guard * minute;
+
+        // The minute that was asleep during the most by a guard
+        max = 0;
+        int part2 = 0;
+        // Loop through every guard
+        for (int i : schedule.keySet()){
             // Loop through every minute
-            for (int i=0; i<60; ++i){
-                // If the guard was asleep more, record it
-                if (schedule.get(guard)[i] > max){
-                    max = schedule.get(guard)[i];
-                    minute = i;
+            for (int j=0; j<60; ++j){
+                // If the guard was asleep most, record it
+                if (schedule.get(i)[j] > max){
+                    max = schedule.get(i)[j];
+                    part2 = i*j;
                 }
             }
-
-            // Print the answer
-            System.out.println(guard * minute);
         }
 
-        // Part 2 finds the minute that a guard was most often asleep during
-        if (PART == 2){
-            // The minute that was asleep during the most by a guard
-            int max = 0;
-            int answer = 0;
-            // Loop through every guard
-            for (int i : schedule.keySet()){
-                // Loop through every minute
-                for (int j=0; j<60; ++j){
-                    // If the guard was asleep most, record it
-                    if (schedule.get(i)[j] > max){
-                        max = schedule.get(i)[j];
-                        answer = i*j;
-                    }
-                }
-            }
-
-            // Print the answer
-            System.out.println(answer);
-        }
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }
