@@ -56,7 +56,7 @@ public class Main {
         // The list of possible arrangements
         Stack<String> states = new Stack<>();
         // Because it's a circle, it arbitrarily starts with person 0
-        states.add("0 "+people.get(0));
+        states.add("0 "+people.getFirst());
         // Continue until all arrangements have been checked
         while (!states.isEmpty()){
             // Grab the current line

@@ -1,45 +1,15 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 14 https://adventofcode.com/2022/day/14
-Input: https://adventofcode.com/2022/day/14/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.HashSet;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 14: Regolith Reservoir";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The area in which the sand falls
-        boolean[][] grid = new boolean[1000][1000];
-        // The number of fallen sand pieces
-        int total = 0;
+        HashSet<ArrayState> covered = new HashSet<>();
         // The largest y-value
         int max = 0;
 
@@ -49,83 +19,69 @@ public class Main {
             String[] list = sc.nextLine().split(" -> ");
             // Split the points into x and y
             int[][] points = new int[list.length][2];
-            for (int i=0; i<list.length; ++i){
-                String[] line = list[i].split(",");
-                points[i][0] = Integer.parseInt(line[0]);
-                points[i][1] = Integer.parseInt(line[1]);
-                if (points[i][1] > max){
-                    max = points[i][1];
-                }
-            }
+            points[0] = Library.intSplit(list[0],",");
 
-            // The beginning of the wall
-            int x = points[0][0];
-            int y = points[0][1];
-
-            // Set it to filled
-            grid[x][y] = true;
+            // Set the beginning to filled
+            covered.add(new ArrayState(points[0].clone()));
             // Fill in between all sets of points
             for (int i=1; i<points.length; ++i){
+                points[i] = Library.intSplit(list[i],",");
+                max = Math.max(max,points[i][1]);
                 // Change x to match, filling in the wall
-                while (x != points[i][0]){
-                    x += (int)Math.signum(points[i][0]-x);
-                    grid[x][y] = true;
+                while (points[0][0] != points[i][0]){
+                    points[0][0] += (int)Math.signum(points[i][0]-points[0][0]);
+                    covered.add(new ArrayState(points[0].clone()));
                 }
                 // Change y to match, filling in the wall
-                while (y != points[i][1]){
-                    y += (int)Math.signum(points[i][1]-y);
-                    grid[x][y] = true;
+                while (points[0][1] != points[i][1]){
+                    points[0][1] += (int)Math.signum(points[i][1]-points[0][1]);
+                    covered.add(new ArrayState(points[0].clone()));
                 }
             }
         }
 
-        // Part 1 counts the number of sand pieces before it falls into the abyss
-
-        // Part 2 adds a floor and counts the number of sand pieces before
-        // the sand source gets filled
-        if (PART == 2){
-            max += 2;
-            for (int i=0; i<grid.length; ++i){
-                grid[i][max] = true;
-            }
-        }
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
 
         // Loop until an exit condition is found
-        while (true){
+        while (!covered.contains(new ArrayState(new int[] {500,0}))){
             // The source of the sand
             int x = 500;
             int y = 0;
             // Drop each piece until it lands
-            while (true){
+            while (!covered.contains(new ArrayState(new int[] {x,y}))){
                 // If a piece has fallen into the abyss, for Part 1
-                if (y+1 == grid.length){
-                    System.out.println(total);
-                    return;
+                if (y+1 == max+2){
+                    if (part1 == 0){
+                        part1 = part2;
+                    }
+                    ++part2;
+                    covered.add(new ArrayState(new int[] {x,y}));
+                    break;
                 }
                 // Fall straight down
-                if (!grid[x][y+1]){
+                if (!covered.contains(new ArrayState(new int[] {x,y+1}))){
                     ++y;
                 // Fall down and to the left
-                }else if (!grid[x-1][y+1]){
+                }else if (!covered.contains(new ArrayState(new int[] {x-1,y+1}))){
                     ++y;
                     --x;
                 // Fall down and to the right
-                }else if (!grid[x+1][y+1]){
+                }else if (!covered.contains(new ArrayState(new int[] {x+1,y+1}))){
                     ++y;
                     ++x;
                 // Landed
                 }else{
-                    grid[x][y] = true;
-                    ++total;
-                    // If the source has been filled, for Part 2
-                    if (x == 500 && y == 0){
-                        System.out.println(total);
-                        return;
-                    }
+                    covered.add(new ArrayState(new int[] {x,y}));
+                    ++part2;
                     // Start a new piece of sand
                     break;
                 }
             }
         }
+
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

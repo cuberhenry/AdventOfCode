@@ -1,146 +1,104 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 12 https://adventofcode.com/2022/day/12
-Input: https://adventofcode.com/2022/day/12/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.LinkedList;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 12: Hill Climbing Algorithm";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The queue of positions to update
-        ArrayList<String> queue = new ArrayList<>();
-        // The height of the land
-        ArrayList<int[]> grid = new ArrayList<>();
+        // Get the height map
+        char[][] grid = Library.getCharMatrix(args);
         // The distance from the start
-        ArrayList<int[]> dist = new ArrayList<>();
+        int[][] dist = new int[grid.length][grid[0].length];
+        // The queue of positions to update
+        LinkedList<ArrayState> queue = new LinkedList<>();
         
-        // The position of the goal
+        // Important locations
+        int startX = 0;
+        int startY = 0;
         int finX = 0;
         int finY = 0;
-
-        // Take in the first line
-        String line = sc.next();
-        // The width of the grid
-        final int WIDTH = line.length();
-        // The default value for distance
-        int max = Integer.MAX_VALUE;
-
-        // Take in the grid
-        while (true){
-            // To be added to grid
-            int[] row = new int[WIDTH];
-            // To be added to dist
-            int[] temp = new int[WIDTH];
-
-            // Take in the next row and initialize values
-            for (int i=0; i<WIDTH; ++i){
-                // Set altitude of position
-                row[i] = line.charAt(i)-'a';
-                // Set distance to unknown
-                temp[i] = max;
-
-                // Starting position for Part 1
-                if (line.charAt(i) == 'S'){
-                    finX = i;
-                    finY = grid.size();
-                    row[i] = 0;
-                }
-
-                // Target position
-                if (line.charAt(i) == 'E'){
-                    queue.add(grid.size()+" "+i);
-                    temp[i] = 0;
-                    row[i] = 25;
-                }
+        for (int i=0; i<grid.length; ++i){
+            // Find the start
+            int index = Library.indexOf(grid[i],'S');
+            if (index != -1){
+                startX = index;
+                startY = i;
+                grid[i][index] = 'a';
             }
 
-            // Add the new arrays
-            grid.add(row);
-            dist.add(temp);
-
-            // If there's no more grid, stop taking it in
-            if (!sc.hasNext()){
-                break;
+            // Find the end
+            index = Library.indexOf(grid[i],'E');
+            if (index != -1){
+                finX = index;
+                finY = i;
+                grid[i][index] = 'z';
             }
 
-            // Take in the next row
-            line = sc.next();
+            // Initialize the distance to infinity
+            for (int j=0; j<grid[i].length; ++j){
+                dist[i][j] = Integer.MAX_VALUE;
+            }
         }
 
-        // The height of the grid
-        final int HEIGHT = grid.size();
-        
+        // End is already at the end
+        dist[finY][finX] = 0;
+
+        // Start the search from the end
+        queue.add(new ArrayState(new int[] {finX,finY}));
+
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
+
         // Breadth First Search
         while (!queue.isEmpty()){
             // Take the position values out of the queue
-            String[] pos = queue.remove(0).split(" ");
-            int i = Integer.parseInt(pos[0]);
-            int j = Integer.parseInt(pos[1]);
-            
-            // Part 1 finds the distance from 'S' to 'E'
-            if (PART == 1){
-                if (finX == j && finY == i){
-                    System.out.println(dist.get(i)[j]);
-                    return;
+            int[] pos = queue.remove().getArray();
+            int x = pos[0];
+            int y = pos[1];
+
+            // Check win conditions
+            if (grid[y][x] == 'a'){
+                if (x == startX && y == startY){
+                    part1 = dist[startY][startX];
+                }
+                if (part2 == 0){
+                    part2 = dist[y][x];
+                }
+                if (part1 != 0 && part2 != 0){
+                    break;
                 }
             }
-            
-            // Part 2 finds the distance from any 'a' to 'E'
-            if (PART == 2){
-                if (grid.get(i)[j] == 0){
-                    System.out.println(dist.get(i)[j]);
-                    return;
+
+            // Look in each direction
+            for (int i=0; i<4; ++i){
+                int newX = x;
+                int newY = y;
+
+                switch(i){
+                    case 0 -> ++newX;
+                    case 1 -> ++newY;
+                    case 2 -> --newX;
+                    case 3 -> --newY;
                 }
-            }
-            // Distance update north
-            if (i > 0 && grid.get(i)[j] - grid.get(i-1)[j] <= 1 && dist.get(i-1)[j] == max){
-                dist.get(i-1)[j] = dist.get(i)[j] + 1;
-                queue.add(i-1+" "+j);
-            }
-            // Distance update south
-            if (i < HEIGHT-1 && grid.get(i)[j] - grid.get(i+1)[j] <= 1 && dist.get(i+1)[j] == max){
-                dist.get(i+1)[j] = dist.get(i)[j] + 1;
-                queue.add(i+1+" "+j);
-            }
-            // Distance update west
-            if (j > 0 && grid.get(i)[j] - grid.get(i)[j-1] <= 1 && dist.get(i)[j-1] == max){
-                dist.get(i)[j-1] = dist.get(i)[j] + 1;
-                queue.add(i+" "+(j-1));
-            }
-            // Distance update east
-            if (j < WIDTH-1 && grid.get(i)[j] - grid.get(i)[j+1] <= 1 && dist.get(i)[j+1] == max){
-                dist.get(i)[j+1] = dist.get(i)[j] + 1;
-                queue.add(i+" "+(j+1));
+
+                // Can't go off the edge
+                if (newX < 0 || newY < 0 || newY == grid.length || newX == grid[0].length){
+                    continue;
+                }
+
+                // Only if the new path is better and doesn't climb more than 1
+                if (dist[newY][newX] <= dist[y][x] + 1 || grid[y][x] - grid[newY][newX] > 1){
+                    continue;
+                }
+
+                // Update the state
+                dist[newY][newX] = dist[y][x] + 1;
+                queue.add(new ArrayState(new int[] {newX,newY}));
             }
         }
+
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

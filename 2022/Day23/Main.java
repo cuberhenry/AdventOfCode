@@ -1,48 +1,22 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 23 https://adventofcode.com/2022/day/23
-Input: https://adventofcode.com/2022/day/23/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
-public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
 
+public class Main {
+    final private static String name = "Day 23: Unstable Diffusion";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The number of rows so far in the input
         int numRows = 0;
         // The list of all elf positions
         ArrayList<int[]> elves = new ArrayList<>();
         // The numbers to add to the positions to change direction
-        int[][] directions = {{0,-1},{0,1},{-1,0},{1,0}};
+        ArrayList<int[]> directions = new ArrayList<>();
+        directions.add(new int[] {0,-1});
+        directions.add(new int[] {0,1});
+        directions.add(new int[] {-1,0});
+        directions.add(new int[] {1,0});
 
         // Take in all the input
         while (sc.hasNext()){
@@ -53,22 +27,38 @@ public class Main {
             // Add all elves to the list
             for (int i=0; i<line.length(); ++i){
                 if (line.charAt(i) == '#'){
-                    elves.add(new int[] {i,numRows,-1});
+                    elves.add(new int[] {i,numRows,4});
                 }
             }
         }
 
         // Whether an elf moved this round
         boolean moved = true;
-        // The round number
-        int round;
+        // The answer to the problem
+        int part1 = 0;
+        int part2;
+
         // Loop until no elves move
-        for (round = 0; moved; ++round){
-            // Part 1 only performs 10 rounds
-            if (PART == 1){
-                if (round == 10){
-                    break;
+        for (part2 = 0; moved; ++part2){
+            // Find the spread at 10 rounds
+            if (part2 == 10){
+                // The initial minima and maxima
+                int minX = elves.get(0)[0];
+                int maxX = minX;
+                int minY = elves.get(0)[1];
+                int maxY = minY;
+                
+                // Find the minima and maxima
+                for (int i=1; i<elves.size(); ++i){
+                    minX = Math.min(elves.get(i)[0],minX);
+                    maxX = Math.max(elves.get(i)[0],maxX);
+                    
+                    minY = Math.min(elves.get(i)[1],minY);
+                    maxY = Math.max(elves.get(i)[1],maxY);
                 }
+
+                // Save the result
+                part1 = (maxY-minY+1) * (maxX-minX+1) - elves.size();
             }
 
             // No elves have moved this round
@@ -81,13 +71,11 @@ public class Main {
             for (int i=0; i<elves.size(); ++i){
                 // Add an empty list
                 touching.add(new ArrayList<>());
-                // Set the direction to not move
-                elves.get(i)[2] = -1;
                 // Loop through all previous elves
                 for (int j=0; j<i; ++j){
                     // If they're within one square, add them to each other's touching
                     if (Math.abs(elves.get(i)[0]-elves.get(j)[0]) <= 1 && Math.abs(elves.get(i)[1] - elves.get(j)[1]) <= 1){
-                        touching.get(i).add(j);
+                        touching.getLast().add(j);
                         touching.get(j).add(i);
                     }
                 }
@@ -102,36 +90,19 @@ public class Main {
                     // Set its direction to the first check
                     elf[2] = 0;
                     // Loop through all of the close elves
-                    for (int j=0; j<touching.get(i).size(); ++j){
+                    for (int j=0; j<touching.get(i).size() && elf[2] < 4; ++j){
                         // The other elf's position and direction
                         int[] other = elves.get(touching.get(i).get(j));
-                        // If the other elf is north of the current elf
-                        if (elf[2] == (-round%4+4)%4 && elf[1] - other[1] == 1){
-                            elf[2] = (-round%4+4)%4+1;
-                            j=-1;
-                            continue;
-                        }
-                        // If the other elf is south of the current elf
-                        if (elf[2] == (-round%4+5)%4 && other[1] - elf[1] == 1){
-                            elf[2] = (-round%4+5)%4+1;
-                            j=-1;
-                            continue;
-                        }
-                        // If the other elf is west of the current elf
-                        if (elf[2] == (-round%4+6)%4 && elf[0] - other[0] == 1){
-                            elf[2] = (-round%4+6)%4+1;
-                            j=-1;
-                            continue;
-                        }
-                        // If the other elf is east of the current elf
-                        if (elf[2] == (-round%4+7)%4 && other[0] - elf[0] == 1){
-                            elf[2] = (-round%4+7)%4+1;
-                            j=-1;
-                            continue;
-                        }
-                        // The elf can no longer move
-                        if (elf[2] == 4){
-                            break;
+
+                        // The difference between the two
+                        int[] diff = new int[2];
+                        diff[0] = other[0] - elf[0];
+                        diff[1] = other[1] - elf[1];
+
+                        if (diff[0] != 0 && diff[0] == directions.get(elf[2])[0] && Math.abs(diff[1]) <= 1
+                            || diff[1] != 0 && diff[1] == directions.get(elf[2])[1] && Math.abs(diff[0]) <= 1){
+                                ++elf[2];
+                                j = -1;
                         }
                     }
                 }
@@ -142,7 +113,7 @@ public class Main {
                 // The current elf's position and direction
                 int[] elf = elves.get(i);
                 // If this elf didn't propose a direction, move on
-                if (elf[2] == -1 || elf[2] == 4){
+                if (elf[2] == 4){
                     continue;
                 }
                 // Loop through every future elf
@@ -150,11 +121,11 @@ public class Main {
                     // The other elf's position and direction
                     int[] other = elves.get(j);
                     // If the elves are going to move into each other
-                    if (other[2] >= 0 && other[2] <= 3 && elf[0]+directions[elf[2]][0] == other[0]+directions[other[2]][0]
-                            && elf[1]+directions[elf[2]][1] == other[1]+directions[other[2]][1]){
+                    if (other[2] != 4 && elf[0]+directions.get(elf[2])[0] == other[0]+directions.get(other[2])[0]
+                            && elf[1]+directions.get(elf[2])[1] == other[1]+directions.get(other[2])[1]){
                         // Neither of them move
-                        elf[2] = -1;
-                        other[2] = -1;
+                        elf[2] = 4;
+                        other[2] = 4;
                         break;
                     }
                 }
@@ -163,48 +134,21 @@ public class Main {
             // Loop through every elf
             for (int[] elf : elves){
                 // If the elf is moving
-                if (elf[2] >= 0 && elf[2] <= 3){
+                if (elf[2] != 4){
                     // Move the elf
-                    elf[0] += directions[elf[2]][0];
-                    elf[1] += directions[elf[2]][1];
+                    elf[0] += directions.get(elf[2])[0];
+                    elf[1] += directions.get(elf[2])[1];
+                    elf[2] = 4;
                     // An elf has moved
                     moved = true;
                 }
             }
             
             // Change the priority of directions
-            int[] help = directions[0];
-            directions[0] = directions[1];
-            directions[1] = directions[2];
-            directions[2] = directions[3];
-            directions[3] = help;
+            directions.add(directions.removeFirst());
         }
 
-        // Part 1 finds the number of empty squares between elves
-        if (PART == 1){
-            // The initial minima and maxima
-            int minX = elves.get(0)[0];
-            int maxX = minX;
-            int minY = elves.get(0)[1];
-            int maxY = minY;
-            
-            // Find the minima and maxima
-            for (int i=1; i<elves.size(); ++i){
-                minX = Math.min(elves.get(i)[0],minX);
-                maxX = Math.max(elves.get(i)[0],maxX);
-                
-                minY = Math.min(elves.get(i)[1],minY);
-                maxY = Math.max(elves.get(i)[1],maxY);
-            }
-
-            // Print the result
-            System.out.println((maxY-minY+1)*(maxX-minX+1)-elves.size());
-        }
-
-        // Part 2 finds the number of rounds until no elves move
-        if (PART == 2){
-            // Print the result
-            System.out.println(round);
-        }
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

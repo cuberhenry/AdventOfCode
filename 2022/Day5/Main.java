@@ -1,41 +1,12 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 5 https://adventofcode.com/2022/day/5
-Input: https://adventofcode.com/2022/day/5/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 5: Supply Stacks";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
         // The rows of crates
         Stack<String> crates = new Stack<>();
         String line = sc.nextLine();
@@ -43,9 +14,7 @@ public class Main {
         int numStacks = 0;
         // Put the rows of crates into a stack
         while (line.charAt(1) != '1'){
-            if ((line.length()+1) / 4 > numStacks){
-                numStacks = (line.length()+1) / 4;
-            }
+            numStacks = Math.max(numStacks, (line.length()+1) / 4);
             crates.push(line);
             line = sc.nextLine();
         }
@@ -68,6 +37,14 @@ public class Main {
                 }
             }
         }
+
+        // Make a copy
+        ArrayList<Stack<Character>> copy = new ArrayList<>();
+        for (Stack<Character> stack : stacks){
+            Stack<Character> duplicate = new Stack<>();
+            duplicate.addAll(stack);
+            copy.add(duplicate);
+        }
         
         // Loop through all remaining lines of input
         while (sc.hasNext()){
@@ -79,34 +56,32 @@ public class Main {
             sc.next();
             int sec = sc.nextInt();
             
-            // Part 1 moves the crates one at a time
-            if (PART == 1){
-                // Move num crates from stack first to stack sec
-                for (int j=0; j<num; ++j){
-                    stacks.get(sec-1).push(stacks.get(first-1).pop());
-                }
+            // Move num crates from stack first to stack sec
+            for (int j=0; j<num; ++j){
+                stacks.get(sec-1).push(stacks.get(first-1).pop());
             }
             
-            // Part 2 moves the crates in stacks
-            if (PART == 2){
-                // Stack to reverse the reversal of the crates
-                Stack<Character> tempStack = new Stack<>();
-                // Move num crates from stack first to tempStack
-                for (int j=0; j<num; ++j){
-                    tempStack.push(stacks.get(first-1).pop());
-                }
-                // Move num crates from tempStack to stack sec
-                for (int j=0; j<num; ++j){
-                    stacks.get(sec-1).push(tempStack.pop());
-                }
+            // Stack to reverse the reversal of the crates
+            Stack<Character> tempStack = new Stack<>();
+            // Move num crates from stack first to tempStack
+            for (int j=0; j<num; ++j){
+                tempStack.push(copy.get(first-1).pop());
+            }
+            // Move num crates from tempStack to stack sec
+            for (int j=0; j<num; ++j){
+                copy.get(sec-1).push(tempStack.pop());
             }
         }
         
         // Take the list of all the top crates
-        String answer = "";
+        String part1 = "";
+        String part2 = "";
         for (int i=0; i<numStacks; ++i){
-            answer += stacks.get(i).peek();
+            part1 += stacks.get(i).peek();
+            part2 += copy.get(i).peek();
         }
-        System.out.println(answer);
+
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

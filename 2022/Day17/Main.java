@@ -1,78 +1,30 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 17 https://adventofcode.com/2022/day/17
-Input: https://adventofcode.com/2022/day/17/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
-public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.ArrayList;
+import java.util.HashSet;
 
+public class Main {
+    final private static String name = "Day 17: Pyroclastic Flow";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The combinations of indeces, used to find a cycle
-        ArrayList<String> combos = new ArrayList<>();
-        // The height of the tower
-        long height = 0;
         // The input
-        String gas = sc.nextLine();
+        String gas = Library.getString(args);
+        // The combinations of indeces, used to find a cycle
+        HashSet<ArrayState> combos = new HashSet<>();
+        // The height of the tower
+        long part1 = 0;
+        long part2 = 0;
         // The index of the input
         int gasIndex = 0;
         // The index of the objects
         int objIndex = 0;
         // The number of blocks dropped so far
         long numBlocks = 0;
-        // The total number of blocks to be dropped
-        long totalBlocks = 0;
         // Save the index 
         long cycleIndex = 0;
         // The height of the tower at the beginning of the cycle
         long cycleStartHeight = 0;
         // The number of blocks dropped so far
         long cycleStartBlocks = 0;
-        // The height that the tower increases during a cycle
-        long cycleHeight;
-        // The number of blocks that fall during a cycle
-        long cycleBlocks;
-        // The number of cycles that are done
-        long numCycles;
-
-        // Part 1 finds the height of the tower after 2022 blocks
-        if (PART == 1){
-            totalBlocks = 2022;
-        }
-
-        // Part 2 finds the height of the tower after 1_000_000_000_000 blocks
-        if (PART == 2){
-            totalBlocks = 1_000_000_000_000L;
-        }
 
         // The game board
         ArrayList<char[]> grid = new ArrayList<>();
@@ -96,28 +48,35 @@ public class Main {
         objects[4] = new int[][] {{3,1},{4,1},{3,0},{4,0}};
 
         // Continue until a repeating position is found
-        while (numBlocks != totalBlocks){
+        while (numBlocks != 1_000_000_000_000L){
+            // Find the height after 2022 blocks
+            if (numBlocks == 2022){
+                part1 = part2 + grid.size() - 1;
+            }
             // If the cycle has been found and completed
             if (cycleStartBlocks != 0 && cycleIndex == gasIndex){
                 // The height that the tower increases during a cycle
-                cycleHeight = height + grid.size()-1 - cycleStartHeight;
+                long cycleHeight = part2 + grid.size()-1 - cycleStartHeight;
                 // The number of blocks that fall during a cycle
-                cycleBlocks = numBlocks - cycleStartBlocks;
+                long cycleBlocks = numBlocks - cycleStartBlocks;
 
                 // The number of cycles that are done
-                numCycles = (totalBlocks - cycleStartBlocks) / cycleBlocks;
+                long numCycles = (1_000_000_000_000L - cycleStartBlocks) / cycleBlocks;
 
                 // Skip the cycles by adding to numBlocks and height
                 numBlocks += (numCycles-1) * cycleBlocks;
-                height += (numCycles-1) * cycleHeight;
+                part2 += (numCycles-1) * cycleHeight;
             }
 
+            // The current state
+            ArrayState state = new ArrayState(new int[] {gasIndex,objIndex});
+
             // If this combination has been found before
-            if (combos.contains(gasIndex+" "+objIndex)){
+            if (combos.contains(state)){
                 // Save the index
                 cycleIndex = gasIndex;
                 // The height of the tower before the cycle
-                cycleStartHeight = grid.size()-1+height;
+                cycleStartHeight = grid.size()-1+part2;
                 // The number of blocks fallen so far
                 cycleStartBlocks = numBlocks;
 
@@ -128,7 +87,7 @@ public class Main {
             // Until the cycle has been found
             if (cycleStartBlocks == 0){
                 // Save the gas and object index pair
-                combos.add(gasIndex+" "+objIndex);
+                combos.add(state);
             }
             
             // Increase the number of blocks falling
@@ -209,14 +168,15 @@ public class Main {
             if (grid.size() > 1000){
                 for (int j=0; j<980; ++j){
                     grid.remove(1);
-                    ++height;
+                    ++part2;
                 }
             }
         }
         
         // Add the remaining bits of tower to the total height
-        height += grid.size()-1;
+        part2 += grid.size()-1;
+
         // Print the total height
-        System.out.println(height);
+        Library.print(part1,part2,name);
     }
 }

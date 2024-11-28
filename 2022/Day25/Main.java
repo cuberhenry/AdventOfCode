@@ -1,65 +1,25 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 25 https://adventofcode.com/2022/day/25
-Input: https://adventofcode.com/2022/day/25/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
-
+    final private static String name = "Day 25: Full of Hot Air";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-
-        // Part 2 does not require any code to solve
-        if (PART == 2){
-            System.out.println("Start the Blender");
-            return;
-        }
+        // Take in all the input
+        String[] numbers = Library.getStringArray(args,"\n");
 
         // The sum of all the numbers
         long total = 0;
 
-        // Take in all the input
-        while (sc.hasNext()){
-            // Take in the next line
-            String line = sc.nextLine();
+        // For each number
+        for (String number : numbers){
             // The power of the digit
             long power = 1;
             // Work from least significant to most significant digit
-            for (int j=line.length()-1; j>=0; --j){
+            for (int j=number.length()-1; j>=0; --j){
                 // The value at this digit
-                int num = switch (line.charAt(j)) {
+                int num = switch (number.charAt(j)) {
                     case '=' -> -2;
                     case '-' -> -1;
-                    default -> Integer.parseInt(line.substring(j,j+1));
+                    default -> Integer.parseInt(number.substring(j,j+1));
                 };
                 // Add the amount to the total
                 total += power * num;
@@ -69,28 +29,31 @@ public class Main {
         }
         
         // The result to be printed
-        String answer = "";
+        String part1 = "";
         // Until the entire number has been represented
         while (total != 0){
             // If the number requires a minus
             if (total % 5 == 4){
-                answer = "-" + answer;
+                part1 = "-" + part1;
                 // Increase the total for the integer division
                 ++total;
             // If the number requires a double-minus
             }else if (total % 5 == 3){
-                answer = "=" + answer;
+                part1 = "=" + part1;
                 // Increase the total for the integer division
                 total += 2;
             // Normal base10 digit
             }else{
-                answer = (total % 5) + answer;
+                part1 = (total % 5) + part1;
             }
             // Integer division
             total /= 5;
         }
+
+        // Part 2 requires no code
+        String part2 = "Start the Blender";
         
         // Print the answer
-        System.out.println(answer);
+        Library.print(part1,part2,name);
     }
 }

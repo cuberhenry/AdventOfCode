@@ -1,58 +1,21 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 9 https://adventofcode.com/2022/day/9
-Input: https://adventofcode.com/2022/day/9/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.Scanner;
+import java.util.HashSet;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 9: Rope Bridge";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // List to keep track of visited positions
-        ArrayList<String> positions = new ArrayList<>();
+        HashSet<ArrayState> part1 = new HashSet<>();
+        HashSet<ArrayState> part2 = new HashSet<>();
         // The array to keep track of the locations of each knot
-        int[][] array = new int[0][0];
-        
-        // Part 1 finds the number of locations the second knot visits
-        if (PART == 1){
-            array = new int[2][2];
-        }
-        
-        // Part 2 finds the number of locations the tenth knot visits
-        if (PART == 2){
-            array = new int[10][2];
-        }
-        
+        int[][] array = new int[10][2];
         // Add the current location as a visited one
-        positions.add(array[array.length-1][0] + " " + array[array.length-1][1]);
+        part1.add(new ArrayState(new int[] {0,0}));
+        part2.add(new ArrayState(new int[] {0,0}));
 
         // Loop through all lines of input
         while (sc.hasNext()){
@@ -64,17 +27,11 @@ public class Main {
             // Repeat num times
             for (int j=0; j<num; ++j){
                 // Move the head in the indicated direction
-                if (dir == 'U'){
-                    ++array[0][1];
-                }
-                if (dir == 'R'){
-                    ++array[0][0];
-                }
-                if (dir == 'D'){
-                    --array[0][1];
-                }
-                if (dir == 'L'){
-                    --array[0][0];
+                switch(dir){
+                    case 'U' -> ++array[0][1];
+                    case 'R' -> ++array[0][0];
+                    case 'D' -> --array[0][1];
+                    case 'L' -> --array[0][0];
                 }
                 
                 // Loop through every knot
@@ -90,16 +47,13 @@ public class Main {
                     }
                 }
 
-                // If the tail hasn't been to this position yet
-                if (!positions.contains(array[array.length-1][0] + " "
-                                      + array[array.length-1][1])){
-                    // Add the position to the list of visited positions
-                    positions.add(array[array.length-1][0] + " "
-                                + array[array.length-1][1]);
-                }
+                // Add the two positions
+                part1.add(new ArrayState(array[1].clone()));
+                part2.add(new ArrayState(array[9].clone()));
             }
         }
 
-        System.out.println(positions.size());
+        // Print the answer
+        Library.print(part1.size(),part2.size(),name);
     }
 }

@@ -93,9 +93,9 @@ public class Main {
                 for (int j=0; j<3; ++j){
                     // If the current particle has the greatest position, velocity,
                     // and acceleration in any given direction
-                    if ((particle[0][j] == allValues.get(j).get(0) &&
-                        particle[1][j] == allValues.get(j+3).get(0) &&
-                        particle[2][j] == allValues.get(j+6).get(0)) ||
+                    if ((particle[0][j] == allValues.get(j).getFirst() &&
+                        particle[1][j] == allValues.get(j+3).getFirst() &&
+                        particle[2][j] == allValues.get(j+6).getFirst()) ||
                         (particle[0][j] == allValues.get(j).get(allValues.get(j).size()-1) &&
                         particle[1][j] == allValues.get(j+3).get(allValues.get(j+3).size()-1) &&
                         particle[2][j] == allValues.get(j+6).get(allValues.get(j+6).size()-1))){

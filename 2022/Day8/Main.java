@@ -1,247 +1,147 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 8 https://adventofcode.com/2022/day/8
-Input: https://adventofcode.com/2022/day/8/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.HashSet;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 8: Treetop Tree House";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The value to be printed
-        int total = 0;
         // The grid of trees
-        ArrayList<int[]> grid = new ArrayList<>();
-        // Take in the first line of input
-        String line = sc.next();
-        // The width of the grid of trees
-        final int WIDTH = line.length();
+        char[][] grid = Library.getCharMatrix(args);
 
-        // Fill in the grid with trees
-        while (true){
-            int[] row = new int[WIDTH];
-            for (int i=0; i<WIDTH; ++i){
-                row[i] = Character.getNumericValue(line.charAt(i));
+        // List of all visible trees except those on the edge
+        HashSet<ArrayState> visible = new HashSet<>();
+
+        // The scenic scores of all trees, skipping the ends
+        // because we already know their scores are 0
+        int[][] scores = new int[grid.length][grid[0].length];
+        // Initialize them all to 1
+        for (int i=1; i<grid.length-1; ++i){
+            for (int j=1; j<grid[0].length-1; ++j){
+                scores[i][j] = 1;
             }
-            grid.add(row);
-            if (!sc.hasNext()){
-                break;
-            }
-            line = sc.next();
         }
 
-        // The height of the grid of trees
-        final int HEIGHT = grid.size();
-        
-        // Part 1 finds how many trees are visible from the perimeter
-        if (PART == 1){
-            // List of all visible trees except those on the edge
-            ArrayList<String> visible = new ArrayList<>();
-
-            // Vertically
-            for (int i=1; i<WIDTH-1; ++i){
-                // From the top
-                int currHeight = grid.get(0)[i];
-                for (int j=1; j<HEIGHT-1 && currHeight<9; ++j){
-                    // Only do something if there's a new tallest
-                    if (grid.get(j)[i] > currHeight){
-                        // Add to visible if not already known
-                        if (!visible.contains(i+" "+j)){
-                            visible.add(i+" "+j);
-                        }
-                        // Update the current biggest height
-                        currHeight = grid.get(j)[i];
-                    }
+        // Vertically
+        for (int i=1; i<grid[0].length-1; ++i){
+            // From the top
+            int currHeight = grid[0][i];
+            // Visible trees
+            Stack<int[]> stack = new Stack<>();
+            stack.push(new int[] {grid[0][i],0});
+            for (int j=1; j<grid.length-1; ++j){
+                // Only do something if there's a new tallest
+                if (grid[j][i] > currHeight){
+                    // Add to visible if not already known
+                    visible.add(new ArrayState(new int[] {i,j}));
+                    // Update the current biggest height
+                    currHeight = grid[j][i];
                 }
-
-                // From the bottom
-                currHeight = grid.get(HEIGHT-1)[i];
-                for (int j=HEIGHT-2; j>0 && currHeight<9; --j){
-                    // Only do something if there's a new tallest
-                    if (grid.get(j)[i] > currHeight){
-                        // Add to visible if not already known
-                        if (!visible.contains(i+" "+j)){
-                            visible.add(i+" "+j);
-                        }
-                        // Update the current biggest height
-                        currHeight = grid.get(j)[i];
-                    }
+                // Look for the furthest visible tree
+                while (!stack.isEmpty() && stack.peek()[0] < grid[j][i]){
+                    stack.pop();
+                }
+                scores[j][i] *= j - (stack.isEmpty() ? 0 : stack.peek()[1]);
+                // Add this tree to the stack
+                if (!stack.isEmpty() && stack.peek()[0] == grid[j][i]){
+                    stack.peek()[1] = j;
+                }else{
+                    stack.push(new int[] {grid[j][i],j});
                 }
             }
 
-            // Horizontally
-            for (int j=1; j<HEIGHT-1; ++j){
-                // From the left
-                int currHeight = grid.get(j)[0];
-                for (int i=1; i<WIDTH-1 && currHeight<9; ++i){
-                    // Only do something if there's a new tallest
-                    if (grid.get(j)[i] > currHeight){
-                        // Add to visible if not already known
-                        if (!visible.contains(i+" "+j)){
-                            visible.add(i+" "+j);
-                        }
-                        // Update the current biggest height
-                        currHeight = grid.get(j)[i];
-                    }
+            // From the bottom
+            currHeight = grid[grid.length-1][i];
+            stack.clear();
+            stack.push(new int[] {grid[grid.length-1][i],grid.length-1});
+            for (int j=grid.length-2; j>0; --j){
+                // Only do something if there's a new tallest
+                if (grid[j][i] > currHeight){
+                    // Add to visible if not already known
+                    visible.add(new ArrayState(new int[] {i,j}));
+                    // Update the current biggest height
+                    currHeight = grid[j][i];
                 }
-
-                // From the right
-                currHeight = grid.get(j)[WIDTH-1];
-                for (int i=WIDTH-2; i>0 && currHeight<9; --i){
-                    // Only do something if there's a new tallest
-                    if (grid.get(j)[i] > currHeight){
-                        // Add to visible if not already known
-                        if (!visible.contains(i+" "+j)){
-                            visible.add(i+" "+j);
-                        }
-                        // Update the current biggest height
-                        currHeight = grid.get(j)[i];
-                    }
+                // Look for the furthest visible tree
+                while (!stack.isEmpty() && stack.peek()[0] < grid[j][i]){
+                    stack.pop();
+                }
+                scores[j][i] *= (stack.isEmpty() ? grid.length-1 : stack.peek()[1]) - j;
+                // Add this tree to the stack
+                if (!stack.isEmpty() && stack.peek()[0] == grid[j][i]){
+                    stack.peek()[1] = j;
+                }else{
+                    stack.push(new int[] {grid[j][i],j});
                 }
             }
-
-            // Add to the number visible all of the edge trees
-            total = visible.size() + 2*HEIGHT + 2*WIDTH - 4;
         }
 
-        // Part 2 finds the greatest visibility score of a tree
-        if (PART == 2){
-            // The visibility scores of all trees, skipping the ends
-            // because we already know their scores are 0
-            int[][] scores = new int[HEIGHT][WIDTH];
-            // Initialize them all to 1
-            for (int i=1; i<HEIGHT-1; ++i){
-                for (int j=1; j<WIDTH-1; ++j){
-                    scores[i][j] = 1;
+        // Horizontally
+        for (int j=1; j<grid.length-1; ++j){
+            // From the left
+            int currHeight = grid[j][0];
+            // Visible trees
+            Stack<int[]> stack = new Stack<>();
+            stack.push(new int[] {grid[j][0],0});
+            for (int i=1; i<grid[0].length-1; ++i){
+                // Only do something if there's a new tallest
+                if (grid[j][i] > currHeight){
+                    // Add to visible if not already known
+                    visible.add(new ArrayState(new int[] {i,j}));
+                    // Update the current biggest height
+                    currHeight = grid[j][i];
                 }
-            }
-            
-            // Vertically
-            for (int i=1; i<WIDTH-1; ++i){
-                // The current visible trees
-                Stack<Integer> stack = new Stack<>();
-                // Go down tree by tree
-                for (int j=1; j<HEIGHT-1; ++j){
-                    // Update previous trees' southward visibility
-                    while (!stack.isEmpty() && grid.get(j)[i] > stack.peek()%10){
-                        // If a tree is smaller than the current tree, it can see up
-                        // to the current tree but not past
-                        scores[stack.peek()/10][i] *= j-stack.peek()/10;
-                        if (scores[stack.peek()/10][i] > total){
-                            total = scores[stack.peek()/10][i];
-                        }
-                        stack.pop();
-                    }
-
-                    // Update the current tree's northward visibility
-                    if (stack.isEmpty()){
-                        scores[j][i] *= j;
-                    }else{
-                        scores[j][i] *= j-stack.peek()/10;
-
-                        // Trees can't see past equally sized trees
-                        if (grid.get(j)[i] == stack.peek()%10){
-                            scores[stack.peek()/10][i] *= j-stack.peek()/10;
-                            if (scores[stack.peek()/10][i] > total){
-                                total = scores[stack.peek()/10][i];
-                            }
-                            stack.pop();
-                        }
-                    }
-
-                    // Add the current tree to the stack
-                    stack.push(j*10+grid.get(j)[i]);
-                }
-
-                // Update all remaining trees to be able to see to the south
-                // edge of the map
-                while (!stack.isEmpty()){
-                    scores[stack.peek()/10][i] *= HEIGHT-1-stack.peek()/10;
-                    if (scores[stack.peek()/10][i] > total){
-                        total = scores[stack.peek()/10][i];
-                    }
+                // Look for the furthest visible tree
+                while (!stack.isEmpty() && stack.peek()[0] < grid[j][i]){
                     stack.pop();
+                }
+                scores[j][i] *= i - (stack.isEmpty() ? 0 : stack.peek()[1]);
+                // Add this tree to the stack
+                if (!stack.isEmpty() && stack.peek()[0] == grid[j][i]){
+                    stack.peek()[1] = i;
+                }else{
+                    stack.push(new int[] {grid[j][i],i});
                 }
             }
 
-            // Horizontally
-            for (int j=1; j<HEIGHT-1; ++j){
-                // The current visible trees
-                Stack<Integer> stack = new Stack<>();
-                // Go right tree by tree
-                for (int i=1; i<WIDTH-1; ++i){
-                    // Update previous trees' eastward visibility
-                    while (!stack.isEmpty() && grid.get(j)[i] > stack.peek()%10){
-                        // If a tree is smaller than the current tree, it can see up
-                        // to the current tree but not past
-                        scores[j][stack.peek()/10] *= i-stack.peek()/10;
-                        if (scores[j][stack.peek()/10] > total){
-                            total = scores[j][stack.peek()/10];
-                        }
-                        stack.pop();
-                    }
-
-                    // Update the current tree's westward visibility
-                    if (stack.isEmpty()){
-                        scores[j][i] *= i;
-                    }else{
-                        scores[j][i] *= i-stack.peek()/10;
-
-                        // Trees can't see past equally sized trees
-                        if (grid.get(j)[i] == stack.peek()%10){
-                            scores[j][stack.peek()/10] *= i-stack.peek()/10;
-                            if (scores[j][stack.peek()/10] > total){
-                                total = scores[j][stack.peek()/10];
-                            }
-                            stack.pop();
-                        }
-                    }
-
-                    // Add the current tree to the stack
-                    stack.push(i*10+grid.get(j)[i]);
+            // From the right
+            currHeight = grid[j][grid[0].length-1];
+            stack.clear();
+            stack.push(new int[] {grid[j][grid[0].length-1],grid[0].length-1});
+            for (int i=grid[0].length-2; i>0; --i){
+                // Only do something if there's a new tallest
+                if (grid[j][i] > currHeight){
+                    // Add to visible if not already known
+                    visible.add(new ArrayState(new int[] {i,j}));
+                    // Update the current biggest height
+                    currHeight = grid[j][i];
                 }
-
-                // Update all remaining trees to be able to see to the east
-                // edge of the map
-                while (!stack.isEmpty()){
-                    scores[j][stack.peek()/10] *= WIDTH-1-stack.peek()/10;
-                    if (scores[j][stack.peek()/10] > total){
-                        total = scores[j][stack.peek()/10];
-                    }
+                // Look for the furthest visible tree
+                while (!stack.isEmpty() && stack.peek()[0] < grid[j][i]){
                     stack.pop();
                 }
+                scores[j][i] *= (stack.isEmpty() ? grid[0].length-1 : stack.peek()[1]) - i;
+                // Add this tree to the stack
+                if (!stack.isEmpty() && stack.peek()[0] == grid[j][i]){
+                    stack.peek()[1] = i;
+                }else{
+                    stack.push(new int[] {grid[j][i],i});
+                }
+            }
+        }
+
+        // The answer to the problem
+        int part1 = visible.size() + 2*grid.length + 2*grid[0].length - 4;
+        int part2 = 0;
+
+        // Find the best scenic score
+        for (int i=1; i<scores.length-1; ++i){
+            for (int j=1; j<scores[i].length-1; ++j){
+                part2 = Math.max(part2,scores[i][j]);
             }
         }
 
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 }

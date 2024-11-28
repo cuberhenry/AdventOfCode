@@ -1,36 +1,37 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 11 https://adventofcode.com/2022/day/11
-Input: https://adventofcode.com/2022/day/11/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class Main {
+    final private static String name = "Day 11: Monkey in the Middle";
 
     // The monkey class helps to abstract the Day 11 problem
     private static class Monkey {
         // The list of items the monkey has
-        ArrayList<Long> items = new ArrayList<>();
+        private LinkedList<Long> items;
+        final private LinkedList<Long> initial;
         // What this monkey does to the worry level of the item
-        String operation;
+        final private char operation;
+        final private int change;
         // The number to test the worry level against
-        int test;
+        final private int test;
         // The monkey to give it to if the test is true
-        int trueDest;
+        final private int trueDest;
         // The monkey to give it to if the test is false
-        int falseDest;
+        final private int falseDest;
         // The number of items the monkey has inspected
-        long numInspected = 0;
+        private long numInspected = 0;
         
         // Constructor
-        public Monkey(String op, int t, int y, int n){
-            operation = op;
+        public Monkey(String op, int t, int y, int n, LinkedList<Long> i){
+            operation = op.charAt(0);
+            change = op.substring(2).equals("old") ? -1 : Integer.parseInt(op.substring(2));
             test = t;
             trueDest = y;
             falseDest = n;
+            items = i;
+            initial = new LinkedList<>(i);
         }
         
         // Give the monkey an item with the worry level i
@@ -39,31 +40,25 @@ public class Main {
         }
         
         // Let the monkey inspect all of its items
-        public void inspect(ArrayList<Monkey> monkeys, long modulo){
+        public void inspect(ArrayList<Monkey> monkeys, long modulo, boolean divide){
             // Loop through all of its items
             while (!items.isEmpty()){
                 // Grab the item to inspect it
-                long num = items.remove(0);
+                long num = items.remove();
                 // Perform operation on the item's worry level
-                if (operation.charAt(0) == '+'){
-                    num += Integer.parseInt(operation.substring(2));
+                if (operation == '+'){
+                    num += change;
+                }else if (change == -1){
+                    num *= num;
                 }else{
-                    if (operation.substring(2).equals("old")){
-                        num *= num;
-                    }else{
-                        num *= Integer.parseInt(operation.substring(2));
-                    }
+                    num *= change;
                 }
                 
-                // Part 1 decreases all worry levels by a factor of 3
-                if (PART == 1){
+                // Keep worry levels manageable
+                if (divide){
                     num /= 3;
                 }
-                
-                // Part 2 decreases all worry levels without affecting any numbers
-                if (PART == 2){
-                    num %= modulo;
-                }
+                num %= modulo;
                 
                 // Perform the test and pass the item off to a different monkey
                 if (num % test == 0){
@@ -73,7 +68,7 @@ public class Main {
                 }
                 
                 // Increase the number of items inspected
-                numInspected++;
+                ++numInspected;
             }
         }
         
@@ -81,35 +76,17 @@ public class Main {
         public long getInspected(){
             return numInspected;
         }
+
+        // Reset the initial state of the monkey
+        public void reset(){
+            items = initial;
+            numInspected = 0;
+        }
     }
 
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The list of monkeys
         ArrayList<Monkey> monkeys = new ArrayList<>();
         // The modulo value for Part 2
@@ -125,7 +102,7 @@ public class Main {
             }
 
             // List of current items, to be added later
-            ArrayList<Long> list = new ArrayList<>();
+            LinkedList<Long> list = new LinkedList<>();
             // Skip monkey number line and take in the list of items
             line = sc.nextLine();
             // Add the items to list
@@ -142,32 +119,27 @@ public class Main {
             // Take in the monkey to throw to if the test is false
             int falseMonkey = Integer.parseInt(sc.nextLine().substring(30));
             // Create the monkey
-            monkeys.add(new Monkey(operation, test, trueMonkey, falseMonkey));
-            // Give the monkey the items
-            while (!list.isEmpty()){
-                monkeys.get(monkeys.size()-1).giveMonkey(list.remove(0));
-            }
+            monkeys.add(new Monkey(operation, test, trueMonkey, falseMonkey, list));
         }
-        
-        // The number of rounds
-        int numRounds = 0;
-        
-        // Part 1 performs 20 rounds
-        if (PART == 1){
-            numRounds = 20;
+
+        // The answer to the problem
+        long part1 = monkeyBusiness(20,true,monkeys,modulo);
+        for (Monkey monkey : monkeys){
+            monkey.reset();
         }
-        
-        // Part 2 performs 10,000 rounds
-        if (PART == 2){
-            numRounds = 10000;
-        }
-        
+        long part2 = monkeyBusiness(10000,false,monkeys,modulo);
+
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
+
+    private static long monkeyBusiness(int numRounds, boolean divide, ArrayList<Monkey> monkeys, long modulo){
         // Loop through the number of rounds
         for (int i=0; i<numRounds; ++i){
             // Loop through each monkey
             for (Monkey monkey : monkeys){
                 // Allow the monkey to inspect all of the items
-                monkey.inspect(monkeys,modulo);
+                monkey.inspect(monkeys,modulo,divide);
             }
         }
         
@@ -183,6 +155,7 @@ public class Main {
                 two = monkey.getInspected();
             }
         }
-        System.out.println(max * two);
+        
+        return max * two;
     }
 }

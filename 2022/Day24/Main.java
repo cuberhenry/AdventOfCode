@@ -1,47 +1,20 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 24 https://adventofcode.com/2022/day/24
-Input: https://adventofcode.com/2022/day/24/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
-public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import com.aoc.mylibrary.HashQueue;
+import java.util.Scanner;
+import java.util.ArrayList;
 
+public class Main {
+    final private static String name = "Day 24: Blizzard Basin";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The dimensions of the grid
         int width = 0;
         int height = 0;
         // The answer to the problem
-        int total = 0;
+        int part1 = 0;
+        int part2 = 0;
 
         // The list of all the blizzards
         ArrayList<int[]> blizzards = new ArrayList<>();
@@ -54,19 +27,10 @@ public class Main {
             for (int i=0; i<line.length(); ++i){
                 // Add the blizzard with the correct direction to the list
                 switch (line.charAt(i)) {
-                    case '^' -> {
-                        blizzards.add(new int[] {i,height,0});
-                    }
-                    case '>' -> {
-                        blizzards.add(new int[] {i,height,1});
-                    }
-                    case 'v' -> {
-                        blizzards.add(new int[] {i,height,2});
-                    }
-                    case '<' -> {
-                        blizzards.add(new int[] {i,height,3});
-                    }
-                    default -> {}
+                    case '^' -> blizzards.add(new int[] {i,height,0});
+                    case '>' -> blizzards.add(new int[] {i,height,1});
+                    case 'v' -> blizzards.add(new int[] {i,height,2});
+                    case '<' -> blizzards.add(new int[] {i,height,3});
                 }
             }
             // Increase the height
@@ -77,66 +41,64 @@ public class Main {
         int trip = 0;
         
         // The list of states in this time
-        ArrayList<String> queue = new ArrayList<>();
+        HashQueue<ArrayState> queue = new HashQueue<>();
         // Add the first state
-        queue.add("1 0 0");
+        queue.add(new ArrayState(new int[] {1,0}));
         // The amount of time spent so far
         int time = 0;
         // Loop until a break is triggered
         while (true){
             // The list of states for the next time
-            ArrayList<String> newQueue = new ArrayList<>();
+            HashQueue<ArrayState> newQueue = new HashQueue<>();
             // Increase the time
             ++time;
             // Move all of the blizzards
             for (int[] blizzard : blizzards){
                 switch (blizzard[2]) {
-                    case 0:
+                    case 0 -> {
                         --blizzard[1];
                         if (blizzard[1] == 0){
                             blizzard[1] = height-2;
-                        }   break;
-                    case 1:
+                        }
+                    }
+                    case 1 -> {
                         ++blizzard[0];
                         if (blizzard[0] == width-1){
                             blizzard[0] = 1;
-                        }   break;
-                    case 2:
+                        }
+                    }
+                    case 2 -> {
                         ++blizzard[1];
                         if (blizzard[1] == height-1){
                             blizzard[1] = 1;
-                        }   break;
-                    case 3:
+                        }
+                    }
+                    case 3 -> {
                         --blizzard[0];
                         if (blizzard[0] == 0){
                             blizzard[0] = width-2;
-                        }   break;
-                    default:
-                        break;
+                        }
+                    }
                 }
             }
             // Go through all the states
             while (!queue.isEmpty()){
                 // Remove and dissect the state
-                String[] currState = queue.remove(0).split(" ");
-                int x = Integer.parseInt(currState[0]);
-                int y = Integer.parseInt(currState[1]);
+                int[] currState = queue.remove().getArray();
+                int x = currState[0];
+                int y = currState[1];
                 // If the final trip has been completed
                 if (trip == 2 && x == width-2 && y == height-2){
-                    total = time;
+                    part2 = time;
                     break;
                 }
                 // If the first trip has been completed
                 if (trip == 0 && x == width-2 && y == height-2){
-                    // In Part 1, this is the only trip
-                    if (PART == 1){
-                        total = time;
-                        break;
-                    }
+                    part1 = time;
 
                     // Clear the queue and add only one state
                     newQueue.clear();
-                    newQueue.add(width-2+" "+(height-1));
+                    newQueue.add(new ArrayState(new int[] {width-2,(height-1)}));
                     ++trip;
                     break;
                 }
@@ -144,17 +106,17 @@ public class Main {
                 if (trip == 1 && x == 1 && y == 1){
                     // Clear the queue and add only one state
                     newQueue.clear();
-                    newQueue.add("1 0");
+                    newQueue.add(new ArrayState(new int[] {1,0}));
                     ++trip;
                     break;
                 }
 
                 // The five options from any given state
                 boolean good = true;
-                boolean upGood = true;
-                boolean downGood = true;
-                boolean rightGood = true;
-                boolean leftGood = true;
+                boolean upGood = y > 1;
+                boolean downGood = y < height-2;
+                boolean rightGood = x != width-2 && y != 0;
+                boolean leftGood = x != 1 && y != height-1;
 
                 // Loop through all blizzards
                 for (int[] blizzard : blizzards){
@@ -191,44 +153,25 @@ public class Main {
                     }
                 }
 
-                // Check for impassable walls to restrict movement
-                if (x == 1 || y == height-1){
-                    leftGood = false;
-                }
-                if (x == width-2 || y == 0){
-                    rightGood = false;
-                }
-                if (y == 1 || y == 0){
-                    upGood = false;
-                }
-                if (y == height-2 || y == height-1){
-                    downGood = false;
-                }
-
                 // Add possible and newly found states to the new queue
                 if (good){
-                    if (!newQueue.contains(x+" "+y))
-                        newQueue.add(x+" "+y);
+                    newQueue.add(new ArrayState(new int[] {x,y}));
                 }
                 if (upGood){
-                    if (!newQueue.contains(x+" "+(y-1)))
-                        newQueue.add(x+" "+(y-1));
+                    newQueue.add(new ArrayState(new int[] {x,y-1}));
                 }
                 if (downGood){
-                    if (!newQueue.contains(x+" "+(y+1)))
-                        newQueue.add(x+" "+(y+1));
+                    newQueue.add(new ArrayState(new int[] {x,y+1}));
                 }
                 if (rightGood){
-                    if (!newQueue.contains(x+1+" "+y))
-                        newQueue.add(x+1+" "+y);
+                    newQueue.add(new ArrayState(new int[] {x+1,y}));
                 }
                 if (leftGood){
-                    if (!newQueue.contains(x-1+" "+y))
-                        newQueue.add(x-1+" "+y);
+                    newQueue.add(new ArrayState(new int[] {x-1,y}));
                 }
             }
             // If an answer has been found, stop looping
-            if (total != 0){
+            if (part2 != 0){
                 break;
             }
 
@@ -237,6 +180,6 @@ public class Main {
         }
 
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 }

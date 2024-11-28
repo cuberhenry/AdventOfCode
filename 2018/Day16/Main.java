@@ -117,7 +117,7 @@ public class Main {
             // The oppcode can only be one opp
             if (opps.get(i).size() == 1){
                 // Save the opp name
-                String opp = opps.get(i).get(0);
+                String opp = opps.get(i).getFirst();
                 // Remove it from every oppcode
                 for (int j=0; j<opps.size(); ++j){
                     opps.get(j).remove(opp);

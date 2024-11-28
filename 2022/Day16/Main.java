@@ -1,42 +1,13 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 16 https://adventofcode.com/2022/day/16
-Input: https://adventofcode.com/2022/day/16/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
-public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
 
+public class Main {
+    final private static String name = "Day 16: Proboscidea Volcanium";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // Every line of input as a string
         ArrayList<String> input = new ArrayList<>();
         // The name of each valve pulled from the lines of input
@@ -98,29 +69,56 @@ public class Main {
             }
         }
         
-        // The maximum amount of pressure released
-        int maxSolution = 0;
-        // The number of minutes left
-        int minLeft = 0;
+        // The answer to the problem
+        int part1 = maxFlow(30,numWithFlow,valves,shortDist,flowValues,new ArrayList<>());
+        ArrayList<String> eStates = new ArrayList<>();
+        int part2 = maxFlow(26,numWithFlow,valves,shortDist,flowValues,eStates);
 
-        // Part 1 finds the maximum pressure released in 30 minutes
-        if (PART == 1){
-            minLeft = 30;
+        // Reverse the list to improve the clipping
+        Collections.reverse(eStates);
+        // The single best path for 26 minutes
+        int maxSingle = part2;
+        // Go through every state
+        while (!eStates.isEmpty()){
+            String[] state1 = eStates.remove(0).split(" ");
+            // Go through every other state
+            for (int i=0; i<eStates.size(); ++i){
+                // Get the state
+                String state2 = eStates.get(i);
+                // If there is no state this state can be combined with to beat the solution
+                if (maxSingle + Integer.parseInt(state2.split(" ")[1]) < part2){
+                    // Remove it
+                    eStates.remove(i);
+                    --i;
+                    continue;
+                }
+
+                // Checks whether the two paths open the same valve
+                boolean duplicate = false;
+                // Go through every opened valve
+                for (int j=1; j<state1.length-1; ++j){
+                    duplicate = duplicate || state2.contains(state1[j]);
+                }
+                // If it's a duplicate, skip
+                if (duplicate) continue;
+                // If there's a new max, save it
+                part2 = Math.max(part2,Integer.parseInt(state1[1]) + Integer.parseInt(state2.split(" ")[1]));
+            }
         }
 
-        // Part 2 finds the maximum pressure released by two beings in 26 minutes
-        if (PART == 2){
-            minLeft = 26;
-        }
+        // Print the answer
+        Library.print(part1,part2,name);
+    }
 
+    private static int maxFlow(int minLeft, int numWithFlow, ArrayList<String> valves, int[][] shortDist, int[] flowValues, ArrayList<String> states){
         // The queue of states in the breadth first search
         // States have the following form:
         // minLeft currPressureReleased currLocation valves opened ...
         ArrayList<String> queue = new ArrayList<>();
+        // The maximum flow
+        int maxFlow = 0;
         // Add the initial state
         queue.add(minLeft+" 0 AA");
-        // All of the states to be examined in part 2
-        ArrayList<String> eStates = new ArrayList<>();
         
         // Breadth first search
         while (!queue.isEmpty()){
@@ -144,9 +142,7 @@ public class Main {
                     int flow = Integer.parseInt(state[1]);
                     flow += flowValues[i] * newMinLeft;
                     // If we found a better solution, update it
-                    if (flow > maxSolution){
-                        maxSolution = flow;
-                    }
+                    maxFlow = Math.max(maxFlow,flow);
 
                     // Create the new state
                     String newState = newMinLeft + " " + flow + " " + valves.get(i);
@@ -158,50 +154,10 @@ public class Main {
                 }
             }
 
-            // Add the state to examine in Part 2
-            if (PART == 2){
-                eStates.add(line);
-            }
+            // Add the state to examine later
+            states.add(line);
         }
 
-        // Inspect all of the paths and see which two are the best solution
-        if (PART == 2){
-            // Reverse the list to improve the clipping
-            Collections.reverse(eStates);
-            // The single best path for 26 minutes
-            int maxSingle = maxSolution;
-            // Go through every state
-            while (!eStates.isEmpty()){
-                String[] state1 = eStates.remove(0).split(" ");
-                // Go through every other state
-                for (int i=0; i<eStates.size(); ++i){
-                    // Get the state
-                    String state2 = eStates.get(i);
-                    // If there is no state this state can be combined with to beat the solution
-                    if (maxSingle + Integer.parseInt(state2.split(" ")[1]) < maxSolution){
-                        // Remove it
-                        eStates.remove(i);
-                        --i;
-                        continue;
-                    }
-
-                    // Checks whether the two paths open the same valve
-                    boolean duplicate = false;
-                    // Go through every opened valve
-                    for (int j=1; j<state1.length-1; ++j){
-                        if (state2.contains(state1[j])) duplicate = true;
-                    }
-                    // If it's a duplicate, skip
-                    if (duplicate) continue;
-                    // If there's a new max, save it
-                    if (Integer.parseInt(state1[1]) + Integer.parseInt(state2.split(" ")[1]) > maxSolution){
-                        maxSolution = Integer.parseInt(state1[1]) + Integer.parseInt(state2.split(" ")[1]);
-                    }
-                }
-            }
-        }
-
-        // Print the solution
-        System.out.println(maxSolution);
+        return maxFlow;
     }
 }

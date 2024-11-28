@@ -1,95 +1,36 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 3 https://adventofcode.com/2022/day/3
-Input: https://adventofcode.com/2022/day/3/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 3: Rucksack Reorganization";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        // Get all rucksacks
+        String[] rucksacks = Library.getStringArray(args,"\n");
         // Total priority value of all requested items
-        int total = 0;
-        
-        // Part 1 finds the items found in both compartments of each sack
-        if (PART == 1){
-            // Loop through all lines of input
-            while (sc.hasNext()){
-                // The knapsack items
-                String line = sc.next();
-                // Whether the loops should continue searching
-                boolean good = true;
-                
-                // Loop through all items in the first and second halves
-                for (int j=0; j<line.length()/2 && good; ++j){
-                    for (int k=line.length()/2; k<line.length() && good; ++k){
-                        if (line.charAt(j) == line.charAt(k)){
-                            // Add the priority value
-                            total += (line.charAt(j) - 'A' + 27) % 58;
-                            good = false;
-                        }
+        int part1 = 0;
+        int part2 = 0;
+
+        // Loop through every set of three rucksacks
+        for (int i=0; i<rucksacks.length; i+=3){
+            for (int j=0; j<3; ++j){
+                int half = rucksacks[i+j].length() / 2;
+                String secondHalf = rucksacks[i+j].substring(half);
+                for (char c : rucksacks[i+j].substring(0,half).toCharArray()){
+                    if (secondHalf.contains(""+c)){
+                        part1 += (c - 'A' + 27) % 58;
+                        break;
                     }
+                }
+            }
+
+            for (char c : rucksacks[i].toCharArray()){
+                if (rucksacks[i+1].contains(""+c) && rucksacks[i+2].contains(""+c)){
+                    part2 += (c - 'A' + 27) % 58;
+                    break;
                 }
             }
         }
         
-        // Part 2 finds the items found in three sacks
-        if (PART == 2){
-            // Loop through all sets of three lines of input
-            while (sc.hasNext()){
-                // The three sacks to search through
-                String one = sc.next();
-                String two = sc.next();
-                String three = sc.next();
-                
-                // Search through all items of all three sacks
-                outer:
-                for (int j=0; j<one.length(); ++j){
-                    for (int k=0; k<two.length(); ++k){
-                        // All three items have to match, so skip if two don't
-                        if (one.charAt(j) != two.charAt(k)){
-                            continue;
-                        }
-                        for (int l=0; l<three.length(); ++l){
-                            if (one.charAt(j) == three.charAt(l)){
-                                // Add the priority value
-                                total += (one.charAt(j) - 'A' + 27) % 58;
-                                break outer;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        System.out.println(total);
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }

@@ -20,10 +20,10 @@ public class Main {
         // Until a break is found
         while (indices1.size() < 64 || !repetitions1.isEmpty() || indices2.size() < 64 || !repetitions2.isEmpty()){
             // Remove past repetitions
-            if (!repetitions1.isEmpty() && repetitions1.get(0)[0] + 1000 < index){
+            if (!repetitions1.isEmpty() && repetitions1.getFirst()[0] + 1000 < index){
                 repetitions1.remove(0);
             }
-            if (!repetitions2.isEmpty() && repetitions2.get(0)[0] + 1000 < index){
+            if (!repetitions2.isEmpty() && repetitions2.getFirst()[0] + 1000 < index){
                 repetitions2.remove(0);
             }
             // The input string

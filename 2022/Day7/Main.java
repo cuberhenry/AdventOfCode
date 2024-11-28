@@ -1,43 +1,17 @@
-/*
-Henry Anderson
-Advent of Code 2022 Day 7 https://adventofcode.com/2022/day/7
-Input: https://adventofcode.com/2022/day/7/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Stack;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 7: No Space Left On Device";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The number being searched for
-        int total = 0;
+        Scanner sc = Library.getScanner(args);
+
+        // The answer to the problem
+        int part1 = 0;
+        int part2 = 0;
         // The total size of all files
         int sum = 0;
         // Stack representing the current directory hierarchy
@@ -55,19 +29,13 @@ public class Main {
                 // The size of the current directory
                 int num = numStack.pop();
                 
-                // Part 1 finds the total size of all directories that have a
-                // size of at most 100000
-                if (PART == 1){
-                    if (num < 100000){
-                        total += num;
-                    }
+                // If the directory meets the size requirement
+                if (num < 100000){
+                    part1 += num;
                 }
                 
-                // Part 2 finds the smallest directory that could be deleted to
-                // preserve a maximum size of 40000000
-                if (PART == 2){
-                    array.add(num);
-                }
+                // Add to the list of directories
+                array.add(num);
                 
                 // Add current directory size to the parent directory
                 if (!numStack.isEmpty()){
@@ -79,9 +47,7 @@ public class Main {
                 int num = Integer.parseInt(line.substring(0,line.indexOf(' ')));
                 
                 // Add to the sum of all files
-                if (PART == 2){
-                    sum += num;
-                }
+                sum += num;
                 
                 // Add file size to the parent directory
                 if (!numStack.isEmpty()){
@@ -97,32 +63,29 @@ public class Main {
         while (!numStack.isEmpty()){
             int num = numStack.pop();
             
-            if (PART == 1){
-                if (num < 100000){
-                    total += num;
-                }
+            if (num < 100000){
+                part1 += num;
             }
             
-            if (PART == 2){
-                array.add(num);
-            }
+            array.add(num);
                         
             if (!numStack.isEmpty()){
                 numStack.push(num+numStack.pop());
             }
         }
+
+        // Sort the directory sizes
+        Collections.sort(array);
         
-        if (PART == 2){
-            total = sum;
-            // Loop through all directory sizes
-            for (int i=0; i<array.size(); ++i){
-                // If this directory is a better size than total, replace it
-                if (array.get(i) < total && array.get(i) > sum - 40000000){
-                    total = array.get(i);
-                }
+        // Find the smallest directory to delete
+        for (int size : array){
+            if (sum - size <= 40000000){
+                part2 = size;
+                break;
             }
         }
 
-        System.out.println(total);
+        // Print the answer
+        Library.print(part1,part2,name);
     }
 }
