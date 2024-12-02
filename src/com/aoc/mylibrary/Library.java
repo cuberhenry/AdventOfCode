@@ -7,6 +7,7 @@ package com.aoc.mylibrary;
  */
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -42,6 +43,15 @@ public class Library {
         return getString(args).split(delim);
     }
 
+    public static String[][] getStringMatrix(String[] args, String delim1, String delim2){
+        String[] split = getString(args).split(delim1);
+        String[][] matrix = new String[split.length][];
+        for (int i=0; i<split.length; ++i){
+            matrix[i] = split[i].split(delim2);
+        }
+        return matrix;
+    }
+
     public static int getInt(String[] args){
         return Integer.parseInt(getString(args));
     }
@@ -74,6 +84,40 @@ public class Library {
             grid[i] = input.get(i).toCharArray();
         }
         return grid;
+    }
+
+    public static char[][][] getCharTensor(String[] args, String delim){
+        String input = getString(args);
+        String[] outer = input.split(delim);
+        char[][][] tensor = new char[outer.length][][];
+        for (int i=0; i<tensor.length; ++i){
+            String[] inner = outer[i].split("\n");
+            tensor[i] = new char[inner.length][];
+            for (int j=0; j<inner.length; ++j){
+                tensor[i][j] = inner[j].toCharArray();
+            }
+        }
+        return tensor;
+    }
+
+    public static int[][] getIntMatrix(String[] args){
+        char[][] chars = getCharMatrix(args);
+        int[][] matrix = new int[chars.length][chars[0].length];
+        for (int i=0; i<chars.length; ++i){
+            for (int j=0; j<chars[i].length; ++j){
+                matrix[i][j] = chars[i][j] - '0';
+            }
+        }
+        return matrix;
+    }
+
+    public static int[][] getIntMatrix(String[] args, String delim){
+        String[] split = getStringArray(args,"\n");
+        int[][] matrix = new int[split.length][];
+        for (int i=0; i<split.length; ++i){
+            matrix[i] = intSplit(split[i],delim);
+        }
+        return matrix;
     }
 
     public static String[][] getAssembly(String[] args){
@@ -230,6 +274,14 @@ public class Library {
             }
         }
         return -1;
+    }
+
+    public static String toString(char[][] matrix){
+        StringBuilder str = new StringBuilder();
+        for (char[] row : matrix){
+            str.append(Arrays.toString(row));
+        }
+        return str.toString();
     }
 
     public static int count(char[] array, char match){

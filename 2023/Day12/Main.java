@@ -1,43 +1,15 @@
-/*
-Henry Anderson
-Advent of Code 2023 Day 12 https://adventofcode.com/2023/day/12
-Input: https://adventofcode.com/2023/day/12/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 12: Hot Springs";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        Scanner sc = Library.getScanner(args);
+
         // The answer to the problem
-        long total = 0;
+        long part1 = 0;
+        long part2 = 0;
         // A map containing all known patterns
         HashMap<String,Long> map = new HashMap<>();
 
@@ -50,16 +22,9 @@ public class Main {
             // The groups of damaged springs
             String numbers = line.substring(line.indexOf(' ')+1);
 
-            // Part 1 finds the number of possibilities for groups of broken springs
-            // Part 2 unfolds the list into 5 times
-            if (PART == 2){
-                plot = plot+"?"+plot+"?"+plot+"?"+plot+"?"+plot;
-                numbers = numbers+","+numbers+","+numbers+","+numbers+","+numbers;
-            }
-
             // Remove unnecessary extra characters
             while (plot.contains("..")){
-                plot = plot.substring(0,plot.indexOf(".."))+"."+plot.substring(plot.indexOf("..")+2);
+                plot = plot.replace("..",".");
             }
 
             // Get the total
@@ -67,11 +32,21 @@ public class Main {
             // Add it to the map
             map.put(plot+numbers,thisTotal);
             // Increase the total
-            total += thisTotal;
+            part1 += thisTotal;
+
+            plot = plot+"?"+plot+"?"+plot+"?"+plot+"?"+plot;
+            numbers = numbers+","+numbers+","+numbers+","+numbers+","+numbers;
+
+            // Get the total
+            thisTotal = plot(plot,numbers,map);
+            // Add it to the map
+            map.put(plot+numbers,thisTotal);
+            // Increase the total
+            part2 += thisTotal;
         }
 
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 
     // A method which recursively counts the possibilities of plots and numbers

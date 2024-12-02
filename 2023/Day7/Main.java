@@ -1,183 +1,298 @@
-/*
-Henry Anderson
-Advent of Code 2023 Day 7 https://adventofcode.com/2023/day/7
-Input: https://adventofcode.com/2023/day/7/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 7: Camel Cards";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
-        // The list of all Camel Cards hands
+        Scanner sc = Library.getScanner(args);
+        
+        // The list of all Camel Card hands
         ArrayList<String> hands = new ArrayList<>();
-        // The total winnings
-        int total = 0;
-        // The hierarchy of cards
-        String order = "";
-
-        // Part 1 treats J as a jack
-        if (PART == 1){
-            order = "AKQJT98765432";
-        }
-
-        // Part 2 treats J as a joker
-        if (PART == 2){
-            order = "AKQT98765432J";
-        }
-
-        // Loop through each hand
+        // Take in every hand
         while (sc.hasNext()){
-            // Take in the hand
-            String hand = sc.nextLine();
+            hands.add(sc.nextLine());
+        }
 
-            // The list of different cards in this hand
-            ArrayList<Character> cards = new ArrayList<>();
-            // The quantity of each card
-            ArrayList<Integer> count = new ArrayList<>();
+        // Make a copy for wilds
+        ArrayList<String> copy = new ArrayList<>(hands);
+        
+        // Sort them from worst to best
+        hands.sort((a,b) -> {
+            // The quantities of each card in each hand
+            HashMap<Character,Integer> aCards = new HashMap<>();
+            HashMap<Character,Integer> bCards = new HashMap<>();
+
             // Loop through each card
             for (int i=0; i<5; ++i){
-                // If the card is a duplicate
-                if (cards.contains(hand.charAt(i))){
-                    // Increase the count of that card
-                    count.set(cards.indexOf(hand.charAt(i)),count.get(cards.indexOf(hand.charAt(i)))+1);
+                // Add each card
+                if (aCards.containsKey(a.charAt(i))){
+                    aCards.put(a.charAt(i),aCards.get(a.charAt(i)) + 1);
                 }else{
-                    // Add a single card
-                    cards.add(hand.charAt(i));
-                    count.add(1);
+                    aCards.put(a.charAt(i),1);
+                }
+                if (bCards.containsKey(b.charAt(i))){
+                    bCards.put(b.charAt(i),bCards.get(b.charAt(i)) + 1);
+                }else{
+                    bCards.put(b.charAt(i),1);
                 }
             }
 
-            // The type of hand
-            int type;
+            // The type of hand a
+            int aType;
             // Based on the number of unique cards
-            switch (count.size()){
+            switch (aCards.size()){
                 // Five of a kind
-                case 1 -> type = 0;
+                case 1 -> aType = 0;
                 case 2 -> {
-                    if (count.contains(4)){
+                    if (aCards.containsValue(4)){
                         // Four of a kind
-                        type = 1;
+                        aType = 1;
                     }else{
                         // Full house
-                        type = 2;
+                        aType = 2;
                     }
                 }
                 case 3 -> {
-                    if (count.contains(3)){
+                    if (aCards.containsValue(3)){
                         // Three of a kind
-                        type = 3;
+                        aType = 3;
                     }else{
                         // Two pair
-                        type = 4;
+                        aType = 4;
                     }
                 }
                 // One pair
-                case 4 -> type = 5;
+                case 4 -> aType = 5;
                 // High card
-                default -> type = 6;
+                default -> aType = 6;
             }
 
-            // Change jacks
-            if (PART == 2){
-                // Only if there exists at least one jack
-                if (cards.contains('J')){
-                    // Based on which type it was
-                    switch (type){
-                        // High card -> One pair
-                        case 6 -> type = 5;
-                        // One pair -> Three of a kind
-                        // Three of a kind -> Four of a kind
-                        // Full house -> Five of a kind
-                        case 5,3,2 -> type -= 2;
-                        // Two pair can become different things depending
-                        case 4 -> {
-                            // If one of the pairs is jacks
-                            if (count.get(cards.indexOf('J')) == 2){
-                                // Two pair -> Four of a kind
-                                type = 1;
-                            }else{
-                                // Two pair -> Full house
-                                type = 2;
-                            }
+            // The type of hand b
+            int bType;
+            // Based on the number of unique cards
+            switch (bCards.size()){
+                // Five of a kind
+                case 1 -> bType = 0;
+                case 2 -> {
+                    if (bCards.containsValue(4)){
+                        // Four of a kind
+                        bType = 1;
+                    }else{
+                        // Full house
+                        bType = 2;
+                    }
+                }
+                case 3 -> {
+                    if (bCards.containsValue(3)){
+                        // Three of a kind
+                        bType = 3;
+                    }else{
+                        // Two pair
+                        bType = 4;
+                    }
+                }
+                // One pair
+                case 4 -> bType = 5;
+                // High card
+                default -> bType = 6;
+            }
+
+            // Find if one hand is better than another
+            if (aType < bType){
+                return 1;
+            }
+            if (bType < aType){
+                return -1;
+            }
+
+            // The ranking of each card
+            String order = "AKQJT98765432";
+
+            // Compare each card in the hand
+            for (int i=0; i<5; ++i){
+                if (order.indexOf(a.charAt(i)) < order.indexOf(b.charAt(i))){
+                    return 1;
+                }
+                if (order.indexOf(b.charAt(i)) < order.indexOf(a.charAt(i))){
+                    return -1;
+                }
+            }
+
+            return 0;
+        });
+
+        // Sort them from worst to best
+        copy.sort((a,b) -> {
+            // The quantities of each card in each hand
+            HashMap<Character,Integer> aCards = new HashMap<>();
+            HashMap<Character,Integer> bCards = new HashMap<>();
+
+            // Loop through each card
+            for (int i=0; i<5; ++i){
+                // Add each card
+                if (aCards.containsKey(a.charAt(i))){
+                    aCards.put(a.charAt(i),aCards.get(a.charAt(i)) + 1);
+                }else{
+                    aCards.put(a.charAt(i),1);
+                }
+                if (bCards.containsKey(b.charAt(i))){
+                    bCards.put(b.charAt(i),bCards.get(b.charAt(i)) + 1);
+                }else{
+                    bCards.put(b.charAt(i),1);
+                }
+            }
+
+            // The type of hand a
+            int aType;
+            // Based on the number of unique cards
+            switch (aCards.size()){
+                // Five of a kind
+                case 1 -> aType = 0;
+                case 2 -> {
+                    if (aCards.containsValue(4)){
+                        // Four of a kind
+                        aType = 1;
+                    }else{
+                        // Full house
+                        aType = 2;
+                    }
+                }
+                case 3 -> {
+                    if (aCards.containsValue(3)){
+                        // Three of a kind
+                        aType = 3;
+                    }else{
+                        // Two pair
+                        aType = 4;
+                    }
+                }
+                // One pair
+                case 4 -> aType = 5;
+                // High card
+                default -> aType = 6;
+            }
+
+            // The type of hand b
+            int bType;
+            // Based on the number of unique cards
+            switch (bCards.size()){
+                // Five of a kind
+                case 1 -> bType = 0;
+                case 2 -> {
+                    if (bCards.containsValue(4)){
+                        // Four of a kind
+                        bType = 1;
+                    }else{
+                        // Full house
+                        bType = 2;
+                    }
+                }
+                case 3 -> {
+                    if (bCards.containsValue(3)){
+                        // Three of a kind
+                        bType = 3;
+                    }else{
+                        // Two pair
+                        bType = 4;
+                    }
+                }
+                // One pair
+                case 4 -> bType = 5;
+                // High card
+                default -> bType = 6;
+            }
+
+            // Only if there exists at least one jack
+            if (aCards.containsKey('J')){
+                // Based on which type it was
+                switch (aType){
+                    // High card -> One pair
+                    case 6 -> aType = 5;
+                    // One pair -> Three of a kind
+                    // Three of a kind -> Four of a kind
+                    // Full house -> Five of a kind
+                    case 5,3,2 -> aType -= 2;
+                    // Two pair can become different things depending
+                    case 4 -> {
+                        // If one of the pairs is jacks
+                        if (aCards.get('J') == 2){
+                            // Two pair -> Four of a kind
+                            aType = 1;
+                        }else{
+                            // Two pair -> Full house
+                            aType = 2;
                         }
-                        // Four of a kind -> Five of a kind
-                        // Five of a kind -> no change
-                        default -> type = 0;
                     }
+                    // Four of a kind -> Five of a kind
+                    // Five of a kind -> no change
+                    default -> aType = 0;
                 }
             }
 
-            // Add a differentiator at the beginning of the hand
-            hand = order.charAt(type) + hand;
-
-            // Insertion sort
-            boolean inserted = false;
-            for (int i=0; i<hands.size(); ++i){
-                // Comparator
-                boolean greaterThan = false;
-                // Loop through the type followed by each card
-                for (int j=0; j<6; ++j){
-                    // If the new hand is better than the other hand
-                    if (order.indexOf(hand.charAt(j)) < order.indexOf(hands.get(i).charAt(j))){
-                        // Get ready to continue on
-                        greaterThan = true;
-                        break;
-                    }else if (order.indexOf(hand.charAt(j)) > order.indexOf(hands.get(i).charAt(j))){
-                        // Break if the comparison fails
-                        break;
+            // Only if there exists at least one jack
+            if (bCards.containsKey('J')){
+                // Based on which type it was
+                switch (bType){
+                    // High card -> One pair
+                    case 6 -> bType = 5;
+                    // One pair -> Three of a kind
+                    // Three of a kind -> Four of a kind
+                    // Full house -> Five of a kind
+                    case 5,3,2 -> bType -= 2;
+                    // Two pair can become different things depending
+                    case 4 -> {
+                        // If one of the pairs is jacks
+                        if (bCards.get('J') == 2){
+                            // Two pair -> Four of a kind
+                            bType = 1;
+                        }else{
+                            // Two pair -> Full house
+                            bType = 2;
+                        }
                     }
-                }
-                
-                // If the new hand is not greater
-                if (!greaterThan){
-                    // Insert
-                    hands.add(i,hand);
-                    inserted = true;
-                    break;
+                    // Four of a kind -> Five of a kind
+                    // Five of a kind -> no change
+                    default -> bType = 0;
                 }
             }
-            // If the new hand is the greatest
-            if (!inserted){
-                // Insert it at the end
-                hands.add(hand);
-            }
-        }
 
-        // Loop through every hand
+            // Find if one hand is better than another
+            if (aType < bType){
+                return 1;
+            }
+            if (bType < aType){
+                return -1;
+            }
+
+            // The ranking of each card
+            String order = "AKQT98765432J";
+
+            // Compare each card in the hand
+            for (int i=0; i<5; ++i){
+                if (order.indexOf(a.charAt(i)) < order.indexOf(b.charAt(i))){
+                    return 1;
+                }
+                if (order.indexOf(b.charAt(i)) < order.indexOf(a.charAt(i))){
+                    return -1;
+                }
+            }
+
+            return 0;
+        });
+
+        // The total winnings
+        long part1 = 0;
+        long part2 = 0;
+        // Loop through each hand
         for (int i=0; i<hands.size(); ++i){
-            // Add the hand's winnings
-            total += (i+1) * Integer.parseInt(hands.get(i).substring(7));
+            // Multiply the rank by the bid
+            part1 += (i + 1) * Integer.parseInt(hands.get(i).split(" ")[1]);
+            part2 += (i + 1) * Integer.parseInt(copy.get(i).split(" ")[1]);
         }
 
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 }

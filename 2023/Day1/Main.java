@@ -1,73 +1,45 @@
-/*
-Henry Anderson
-Advent of Code 2023 Day 1 https://adventofcode.com/2023/day/1
-Input: https://adventofcode.com/2023/day/1/input
-1st command line argument is which part of the daily puzzle to solve
-2nd command line argument is the file name of the input, defaulted to
-    "input.txt"
-*/
-import java.util.*;
-import java.io.*;
+import com.aoc.mylibrary.Library;
+
 public class Main {
-    // The desired problem to solve
-    static int PART;
-    static Scanner sc;
-    // The file containing the puzzle input
-    static String FILE_NAME = "input.txt";
+    final private static String name = "Day 1: Trebuchet?!";
     public static void main(String args[]) {
-        if (args.length < 1 || args.length > 2){
-            System.out.println("Wrong number of arguments");
-            return;
-        }
-        // Take in the part and file name
-        try {
-            PART = Integer.parseInt(args[0]);
-        } catch (Exception e){}
-        if (!(PART == 1 || PART == 2)){
-            System.out.println("Part can only be 1 or 2");
-            return;
-        }
-        if (args.length == 2){
-            FILE_NAME = args[1];
-        }
-        try {
-            sc = new Scanner(new File(FILE_NAME));
-        }catch (Exception e){
-            System.out.println("File not found");
-            return;
-        }
+        String[] input = Library.getStringArray(args,"\n");
+
         // The sum of the calibration values
-        int total = 0;
+        int part1 = 0;
+        int part2 = 0;
         // Numbers spelled out
         String[] numbers = {"one","two","three","four","five",
                             "six","seven","eight","nine"};
 
         // Loop through every line of input
-        while (sc.hasNext()){
+        for (String line : input){
             // The calibration value for the current line
-            int number = 0;
-            // Take in the input
-            String line = sc.nextLine();
+            int first = 0;
+            int second = 0;
 
             // Loop through every character starting at the front
             // until the first digit is found
-            for (int i=0; i<line.length() && number == 0; ++i){
+            for (int i=0; i<line.length() && (first == 0 || second == 0); ++i){
                 // If a numeral is found
                 if (Character.isDigit(line.charAt(i))){
                     // Set the digit to it
-                    number += 10 * (line.charAt(i)-'0');
-                    break;
+                    if (first == 0){
+                        first = 10 * (line.charAt(i)-'0');
+                        if (second == 0){
+                            second = 10 * (line.charAt(i)-'0');
+                        }
+                    }
                 }
                 
-                // Part 2 allows for spelled out digits
-                if (PART == 2){
+                if (second == 0){
                     // Loop through every possible spelled out digit
                     for (int j=0; j<numbers.length; ++j){
                         // If the current character begins a spelled out digit
                         if (line.length()-i >= numbers[j].length()
                             && line.substring(i,i+numbers[j].length()).equals(numbers[j])){
                             // Set the digit to it
-                            number += 10 * (j+1);
+                            second = 10 * (j+1);
                             break;
                         }
                     }
@@ -76,23 +48,26 @@ public class Main {
 
             // Loop through every character starting at the end
             // until the second digit is found
-            for (int i=line.length()-1; i>=0 && number%10==0; --i){
+            for (int i=line.length()-1; i>=0 && (first%10==0 || second%10==0); --i){
                 // If a numeral is found
                 if (Character.isDigit(line.charAt(i))){
                     // Set the digit to it
-                    number += line.charAt(i)-'0';
-                    break;
+                    if (first % 10 == 0){
+                        first += line.charAt(i)-'0';
+                        if (second % 10 == 0){
+                            second += line.charAt(i)-'0';
+                        }
+                    }
                 }
 
-                // Check for spelled out digits
-                if (PART == 2){
+                if (second % 10 == 0){
                     // Loop through every possible spelled out digit
                     for (int j=0; j<numbers.length; ++j){
                         // If the current character begins a spelled out digit
                         if (line.length()-i >= numbers[j].length()
                             && line.substring(i,i+numbers[j].length()).equals(numbers[j])){
                             // Set the digit to it
-                            number += j+1;
+                            second += j+1;
                             break;
                         }
                     }
@@ -100,10 +75,11 @@ public class Main {
             }
 
             // Add the calibration value to the total
-            total += number;
+            part1 += first;
+            part2 += second;
         }
         
         // Print the answer
-        System.out.println(total);
+        Library.print(part1,part2,name);
     }
 }
