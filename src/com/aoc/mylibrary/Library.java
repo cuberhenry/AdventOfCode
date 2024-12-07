@@ -47,6 +47,10 @@ public class Library {
         return getStringArray(args,"\n");
     }
 
+    public static String[][] getStringMatrix(String[] args, String delim){
+        return getStringMatrix(args,"\n",delim);
+    }
+
     public static String[][] getStringMatrix(String[] args, String delim1, String delim2){
         String[] split = getString(args).split(delim1);
         String[][] matrix = new String[split.length][];
