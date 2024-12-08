@@ -3,7 +3,7 @@ package com.aoc.mylibrary;
 import java.util.Arrays;
 
 public class ArrayState implements Comparable<ArrayState> {
-    private int[] array;
+    final private int[] array;
 
     public ArrayState(int[] a){
         array = a;

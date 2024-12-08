@@ -1,7 +1,7 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
-import com.aoc.mylibrary.HashQueue;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 public class Main {
     final private static String name = "Day 17: Clumsy Crucible";
@@ -26,7 +26,7 @@ public class Main {
         loss.put(startDown,0);
         loss.put(startRight,0);
         // The locations and directions to look
-        HashQueue<ArrayState> queue = new HashQueue<>();
+        LinkedHashSet<ArrayState> queue = new LinkedHashSet<>();
         queue.add(startDown);
         queue.add(startRight);
 
@@ -36,7 +36,7 @@ public class Main {
         // Continue until all locations have been searched
         while (!queue.isEmpty()){
             // Get the information
-            ArrayState state = queue.remove();
+            ArrayState state = queue.removeFirst();
             int[] array = state.getArray();
             int heatLoss = loss.get(state);
 

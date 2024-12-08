@@ -1,8 +1,8 @@
 import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
-import com.aoc.mylibrary.HashQueue;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class Main {
     final private static String name = "Day 24: Blizzard Basin";
@@ -41,7 +41,7 @@ public class Main {
         int trip = 0;
         
         // The list of states in this time
-        HashQueue<ArrayState> queue = new HashQueue<>();
+        LinkedHashSet<ArrayState> queue = new LinkedHashSet<>();
         // Add the first state
         queue.add(new ArrayState(new int[] {1,0}));
         // The amount of time spent so far
@@ -49,7 +49,7 @@ public class Main {
         // Loop until a break is triggered
         while (true){
             // The list of states for the next time
-            HashQueue<ArrayState> newQueue = new HashQueue<>();
+            LinkedHashSet<ArrayState> newQueue = new LinkedHashSet<>();
             // Increase the time
             ++time;
             // Move all of the blizzards
@@ -84,7 +84,7 @@ public class Main {
             // Go through all the states
             while (!queue.isEmpty()){
                 // Remove and dissect the state
-                int[] currState = queue.remove().getArray();
+                int[] currState = queue.removeFirst().getArray();
                 int x = currState[0];
                 int y = currState[1];
                 // If the final trip has been completed

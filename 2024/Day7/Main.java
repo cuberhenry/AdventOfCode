@@ -2,7 +2,7 @@ import com.aoc.mylibrary.*;
 import java.util.*;
 
 public class Main {
-    final private static String name = "Day 7: ";
+    final private static String name = "Day 7: Bridge Repair";
     public static void main(String[] args){
         // Get all the lines of input
         String[][] input = Library.getStringMatrix(args,": ");
