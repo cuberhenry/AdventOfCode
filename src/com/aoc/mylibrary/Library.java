@@ -64,6 +64,15 @@ public class Library {
         return Integer.parseInt(getString(args));
     }
 
+    public static int[] getIntArray(String[] args){
+        char[] chars = getCharArray(args);
+        int[] array = new int[chars.length];
+        for (int i=0; i<chars.length; ++i){
+            array[i] = chars[i] - '0';
+        }
+        return array;
+    }
+
     public static int[] getIntArray(String[] args, String delim){
         return intSplit(getString(args),delim);
     }
