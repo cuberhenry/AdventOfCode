@@ -53,6 +53,10 @@ public class DisjointSet<T> {
         return sizes.get(find(a));
     }
 
+    public int totalSize(){
+        return parents.size();
+    }
+
     public boolean contains(T a){
         return parents.containsKey(a);
     }

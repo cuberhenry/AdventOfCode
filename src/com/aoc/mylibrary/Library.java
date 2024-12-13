@@ -137,8 +137,17 @@ public class Library {
         return matrix;
     }
 
+    public static long[][] getLongMatrix(String[] args, String delim){
+        String[] split = getStringArray(args);
+        long[][] matrix = new long[split.length][];
+        for (int i=0; i<split.length; ++i){
+            matrix[i] = longSplit(split[i],delim);
+        }
+        return matrix;
+    }
+
     public static String[][] getAssembly(String[] args){
-        String[] lines = getStringArray(args,"\n");
+        String[] lines = getStringArray(args);
         String[][] assembly = new String[lines.length][];
         for (int i=0; i<lines.length; ++i){
             assembly[i] = lines[i].split(" ");
