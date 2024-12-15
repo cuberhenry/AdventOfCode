@@ -310,6 +310,15 @@ public class Library {
         return str.toString();
     }
 
+    public static char[][] toCharMatrix(String str){
+        String[] split = str.split("\n");
+        char[][] matrix = new char[split.length][];
+        for (int i=0; i<split.length; ++i){
+            matrix[i] = split[i].toCharArray();
+        }
+        return matrix;
+    }
+
     public static int count(char[] array, char match){
         int count = 0;
         for (char c : array){
