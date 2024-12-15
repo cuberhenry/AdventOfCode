@@ -1,5 +1,7 @@
-import com.aoc.mylibrary.*;
-import java.util.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 public class Main {
     final private static String name = "Day 15: Warehouse Woes";
