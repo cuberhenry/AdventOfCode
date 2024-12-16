@@ -1,5 +1,9 @@
-import com.aoc.mylibrary.*;
-import java.util.*;
+import com.aoc.mylibrary.Library;
+import com.aoc.mylibrary.ArrayState;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 public class Main {
     final private static String name = "Day 16: Reindeer Maze";
