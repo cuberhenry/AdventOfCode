@@ -1,5 +1,4 @@
 import com.aoc.mylibrary.Library;
-import java.util.*;
 
 public class Main {
     final private static String name = "Day 1: Secret Entrance";

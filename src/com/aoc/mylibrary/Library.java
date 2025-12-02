@@ -129,19 +129,27 @@ public class Library {
     }
 
     public static int[][] getIntMatrix(String[] args, String delim){
-        String[] split = getStringArray(args,"\n");
+        return getIntMatrix(args,"\n",delim);
+    }
+
+    public static int[][] getIntMatrix(String[] args, String delim1, String delim2){
+        String[] split = getStringArray(args,delim1);
         int[][] matrix = new int[split.length][];
         for (int i=0; i<split.length; ++i){
-            matrix[i] = intSplit(split[i],delim);
+            matrix[i] = intSplit(split[i],delim2);
         }
         return matrix;
     }
 
     public static long[][] getLongMatrix(String[] args, String delim){
-        String[] split = getStringArray(args);
+        return getLongMatrix(args,"\n",delim);
+    }
+
+    public static long[][] getLongMatrix(String[] args, String delim1, String delim2){
+        String[] split = getStringArray(args,delim1);
         long[][] matrix = new long[split.length][];
         for (int i=0; i<split.length; ++i){
-            matrix[i] = longSplit(split[i],delim);
+            matrix[i] = longSplit(split[i],delim2);
         }
         return matrix;
     }
