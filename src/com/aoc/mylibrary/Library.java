@@ -327,6 +327,38 @@ public class Library {
         return matrix;
     }
 
+    public static String concatenate(int[] array){
+        StringBuilder str = new StringBuilder();
+        for (int num : array){
+            str.append(num);
+        }
+        return str.toString();
+    }
+
+    public static String concatenate(char[] array){
+        StringBuilder str = new StringBuilder();
+        for (char c : array){
+            str.append(c);
+        }
+        return str.toString();
+    }
+
+    public static int concatenateInt(int[] array){
+        StringBuilder str = new StringBuilder();
+        for (int num : array){
+            str.append(num);
+        }
+        return Integer.parseInt(str.toString());
+    }
+
+    public static long concatenateLong(int[] array){
+        StringBuilder str = new StringBuilder();
+        for (int num : array){
+            str.append(num);
+        }
+        return Long.parseLong(str.toString());
+    }
+
     public static int count(char[] array, char match){
         int count = 0;
         for (char c : array){
