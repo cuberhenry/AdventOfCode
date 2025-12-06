@@ -5,16 +5,16 @@ import java.util.Scanner;
 public class Main {
     final private static String name = "Day 5: Cafeteria";
     public static void main(String[] args){
-        Scanner input = Library.getScanner(args);
+        Scanner sc = Library.getScanner(args);
 
         // The answer to the problem
-        long part1 = 0;
+        int part1 = 0;
         long part2 = 0;
 
         // The list of ranges of fresh ingredients
         ArrayList<long[]> ranges = new ArrayList<>();
         // Get the first range
-        String line = input.nextLine();
+        String line = sc.nextLine();
         // Continue until all ranges are processed
         while (!line.equals("")){
             // Get the range as numbers
@@ -32,13 +32,13 @@ public class Main {
             }
             // Add the new range
             ranges.add(newRange);
-            line = input.nextLine();
+            line = sc.nextLine();
         }
 
         // Part 1 finds the number of available ingredients that are fresh
         // Loop through each available ingredient
-        while (input.hasNext()){
-            long i = input.nextLong();
+        while (sc.hasNext()){
+            long i = sc.nextLong();
             // Loop through each range
             for (long[] range : ranges){
                 // If the ingredient is fresh, count it
