@@ -17,7 +17,7 @@ public class Main {
             Stack<Integer> front = new Stack<>();
             Stack<Integer> back = new Stack<>();
             // Turn the string of numbers into an int array
-            int[] numbers = Library.intSplit(sc.nextLine()," ");
+            int[] numbers = Library.intSplit(sc.nextLine());
 
             // Whether enough information was found to extrapolate
             boolean finished = false;

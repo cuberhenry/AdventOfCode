@@ -2,6 +2,7 @@ import com.aoc.mylibrary.Library;
 import com.aoc.mylibrary.ArrayState;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -85,8 +86,14 @@ public class Main {
                 if (drop){
                     // The new list of positions for this brick
                     HashSet<ArrayState> newPositions = new HashSet<>();
+                    // The sorted list of current positions
+                    ArrayList<ArrayState> sortedPositions = new ArrayList<>(brickToPositions.get(i));
+                    Collections.sort(sortedPositions,(a,b) -> {
+                        return a.getArray()[2] - b.getArray()[2];
+                    });
+
                     // Loop through each position
-                    for (ArrayState position : brickToPositions.get(i)){
+                    for (ArrayState position : sortedPositions){
                         // Get the position one below
                         int[] beneath = position.getArray();
                         --beneath[2];

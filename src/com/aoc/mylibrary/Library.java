@@ -279,6 +279,10 @@ public class Library {
         return string;
     }
 
+    public static int[] intSplit(String string){
+        return intSplit(string," ");
+    }
+
     public static int[] intSplit(String string, String delim){
         String[] split = string.split(delim);
         int[] intSplit = new int[split.length];
@@ -422,6 +426,26 @@ public class Library {
         // Find the hash of the string
         md.update(string.getBytes(),0,string.length());
         return new BigInteger(1,md.digest()).toString(16);
+    }
+
+    public static BigInteger[] crossProduct(BigInteger[] a, BigInteger[] b){
+        if (a.length == 2){
+            return crossProduct(Arrays.copyOf(a,3),Arrays.copyOf(b,3));
+        }
+
+        return new BigInteger[] {
+            a[1].multiply(b[2]).subtract(a[2].multiply(b[1])),
+            a[2].multiply(b[0]).subtract(a[0].multiply(b[2])),
+            a[0].multiply(b[1]).subtract(a[1].multiply(b[0]))
+        };
+    }
+
+    public static BigInteger dotProduct(BigInteger[] a, BigInteger[] b){
+        BigInteger sum = new BigInteger("0");
+        for (int i=0; i<a.length; ++i){
+            sum = sum.add(a[i].multiply(b[i]));
+        }
+        return sum;
     }
 
     public static String knotHash(String input){

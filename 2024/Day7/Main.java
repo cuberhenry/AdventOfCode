@@ -15,7 +15,7 @@ public class Main {
         for (String[] line : input){
             // Parse numbers from the string input
             long result = Long.parseLong(line[0]);
-            int[] nums = Library.intSplit(line[1]," ");
+            int[] nums = Library.intSplit(line[1]);
 
             // The list of all possible numbers using the operators
             HashSet<Long> numbers = new HashSet<>();

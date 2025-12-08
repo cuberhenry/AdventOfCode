@@ -137,7 +137,7 @@ public class Main {
         // Take in every line of the sample program
         while (sc.hasNextLine()){
             // Take in the operation as ints
-            int[] opp = Library.intSplit(sc.nextLine()," ");
+            int[] opp = Library.intSplit(sc.nextLine());
 
             // Perform the given operation
             // O A B C

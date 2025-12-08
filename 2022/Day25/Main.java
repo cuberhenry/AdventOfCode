@@ -51,7 +51,7 @@ public class Main {
         }
 
         // Part 2 requires no code
-        String part2 = "Start the Blender";
+        String part2 = "Start The Blender";
         
         // Print the answer
         Library.print(part1,part2,name);

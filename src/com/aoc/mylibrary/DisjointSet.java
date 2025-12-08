@@ -1,6 +1,9 @@
 package com.aoc.mylibrary;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class DisjointSet<T> {
     private HashMap<T,T> parents = new HashMap<>();
@@ -10,10 +13,10 @@ public class DisjointSet<T> {
         if (!parents.containsKey(a)){
             return null;
         }
-        if (parents.get(a).equals(a)){
-            return a;
+        while (!parents.get(a).equals(a)){
+            a = parents.get(a);
         }
-        return find(parents.get(a));
+        return a;
     }
 
     public void add(T a){
@@ -59,5 +62,28 @@ public class DisjointSet<T> {
 
     public boolean contains(T a){
         return parents.containsKey(a);
+    }
+
+    public ArrayList<Integer> orderedSizes(){
+        ArrayList<Integer> orderedSizes = new ArrayList<>();
+        HashSet<T> added = new HashSet<>();
+
+        for (T key : sizes.keySet()){
+            boolean unjoined = true;
+            for (T add : added){
+                if (connected(add,key)){
+                    unjoined = false;
+                    break;
+                }
+            }
+            if (unjoined){
+                orderedSizes.add(sizes.get(key));
+                added.add(key);
+            }
+        }
+
+        Collections.sort(orderedSizes);
+        Collections.reverse(orderedSizes);
+        return orderedSizes;
     }
 }

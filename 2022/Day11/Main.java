@@ -57,8 +57,9 @@ public class Main {
                 // Keep worry levels manageable
                 if (divide){
                     num /= 3;
+                }else{
+                    num %= modulo;
                 }
-                num %= modulo;
                 
                 // Perform the test and pass the item off to a different monkey
                 if (num % test == 0){
@@ -79,7 +80,7 @@ public class Main {
 
         // Reset the initial state of the monkey
         public void reset(){
-            items = initial;
+            items = new LinkedList<>(initial);
             numInspected = 0;
         }
     }
@@ -148,11 +149,12 @@ public class Main {
         long two = 0;
         // Find the two most active monkeys
         for (Monkey monkey : monkeys){
-            if (monkey.getInspected() > max){
+            long inspected = monkey.getInspected();
+            if (inspected > max){
                 two = max;
-                max = monkey.getInspected();
-            }else if (monkey.getInspected() > two){
-                two = monkey.getInspected();
+                max = inspected;
+            }else if (inspected > two){
+                two = inspected;
             }
         }
         

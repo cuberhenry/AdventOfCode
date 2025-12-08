@@ -72,8 +72,8 @@ public class Main {
         
         // Check every square
         for (int i=-1; i<=max; ++i){
-            for (int j=0; j<=max; ++j){
-                for (int k=(i+j)%2; k<=max; k+=2){
+            for (int j=-1; j<=max; ++j){
+                for (int k=(i+j)%2-1; k<=max; k+=2){
                     ArrayState state = new ArrayState(new int[] {i,j,k});
                     // Look in each direction
                     for (int l=0; l<6; ++l){
