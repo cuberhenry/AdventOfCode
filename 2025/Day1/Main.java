@@ -12,7 +12,6 @@ public class Main {
         // The number the dial is currently pointing at
         int dial = 50;
 
-        // PART 1
         for (String line : input){
             // Get the direction to turn the dial
             boolean left = line.charAt(0) == 'L';

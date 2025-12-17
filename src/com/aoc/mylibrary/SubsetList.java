@@ -19,6 +19,10 @@ public class SubsetList<E> implements Iterable<List<E>> {
         list.add(item);
     }
 
+    public int size(){
+        return list.size();
+    }
+
     public Iterator<List<E>> iterator() {
         return new SubsetIterator();
     }

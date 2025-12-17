@@ -314,6 +314,15 @@ public class Library {
         return -1;
     }
 
+    public static boolean contains(int[] array, int value){
+        for (int num : array){
+            if (num == value){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String toString(char[][] matrix){
         StringBuilder str = new StringBuilder();
         for (char[] row : matrix){
@@ -407,6 +416,15 @@ public class Library {
             sum += Math.abs(num);
         }
         return sum;
+    }
+
+    public static BigInteger factorial(BigInteger num){
+        BigInteger product = BigInteger.ONE;
+        while (num.compareTo(BigInteger.ONE) > 0){
+            product = product.multiply(num);
+            num = num.subtract(BigInteger.ONE);
+        }
+        return product;
     }
 
     public static String md5(String string, boolean fill){
